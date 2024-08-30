@@ -9,5 +9,6 @@ import Footer from './Footer';
 import { Question, SelectLang } from './RightContent';
 import { AvatarDropdown, AvatarName } from './RightContent/AvatarDropdown';
 import LogTable from './LogTable';
+import { DefaultForm } from './Form'
 
-export { Footer, Question, SelectLang, AvatarDropdown, AvatarName, LogTable };
+export { Footer, Question, SelectLang, AvatarDropdown, AvatarName, LogTable, DefaultForm };

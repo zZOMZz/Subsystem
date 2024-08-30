@@ -250,20 +250,22 @@ const LogTable: React.FC = () => {
                 })}
                 actionRef={actionRef}
                 rowKey="key"
-                search={{
-                    labelWidth: 120,
-                }}
-                toolBarRender={() => [
-                    <Button
-                        type="primary"
-                        key="primary"
-                        onClick={() => {
-                            handleModalOpen(true);
-                        }}
-                    >
-                        <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-                    </Button>,
-                ]}
+                // search={{
+                //     labelWidth: 120,
+                // }}
+                // toolBarRender={() => [
+                //     <Button
+                //         type="primary"
+                //         key="primary"
+                //         onClick={() => {
+                //             handleModalOpen(true);
+                //         }}
+                //     >
+                //         <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                //     </Button>,
+                // ]}
+                toolBarRender={false}
+                search={false}
                 request={rule}
                 columns={columns}
                 rowSelection={{
