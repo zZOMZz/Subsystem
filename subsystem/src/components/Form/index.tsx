@@ -15,6 +15,8 @@ import { Button, Col, Form, Input, Row, Select, Space, theme } from 'antd';
 import TabInput from './components/TabInput';
 import { values } from 'lodash';
 import PreParameters from './components/Preprocessing';
+import Parameters from './components/Parameters';
+import Trigger from './components/Trigger';
 
 
 export const DefaultForm: React.FC = () => {
@@ -48,6 +50,57 @@ export const DefaultForm: React.FC = () => {
         }
     ]
 
+    const paraConfig = [
+        {
+            name: 'target_label',
+            label: '目标类别',
+            defaultValue: '1',
+            step: '0.1',
+        },
+        {
+            name: 'poisoned_portion',
+            label: '投毒率',
+            defaultValue: '0.1',
+            step: '0.1',
+        },
+        {
+            name: 'trigger_size',
+            label: '触发器尺寸',
+            defaultValue: '3',
+            step: '1',
+        },
+        {
+            name: 'trigger_h',
+            label: '触发器纵向位置',
+            defaultValue: '0',
+            step: '1',
+        },
+        {
+            name: 'trigger_w',
+            label: '触发器横向位置',
+            defaultValue: '0',
+            step: '1',
+        },
+        {
+            name: 'epoch',
+            label: '训练轮数',
+            defaultValue: '150',
+            step: '1',
+        },
+        {
+            name: 'batch_size',
+            label: '训练批次大小',
+            defaultValue: '256',
+            step: '1',
+        },
+        {
+            name: 'learning_rate',
+            label: '学习率',
+            defaultValue: '0.001',
+            step: '0.0001',
+        },
+    ]
+
     return (
         <PageContainer>
             <Card>
@@ -70,46 +123,21 @@ export const DefaultForm: React.FC = () => {
                             <PreParameters />
                         </Col>
                         <Col span={8}>
-                            <ProForm.Group>
-                                <ProFormSelect
-                                    options={[
-                                        {
-                                            value: 'chapter',
-                                            label: '盖章后生效',
-                                        },
-                                    ]}
-                                    width="xs"
-                                    name="chapter"
-                                    label="合同约定生效方式"
-                                />
-                                <ProFormSelect
-                                    width="xs"
-                                    options={[
-                                        {
-                                            value: 'time',
-                                            label: '履行完终止',
-                                        },
-                                    ]}
-                                    name="unusedMode"
-                                    label="合同约定失效效方式"
-                                />
-                            </ProForm.Group>
-                            <ProForm.Group>
-                                <ProFormRadio.Group
-                                    label="发票类型"
-                                    name="invoiceType"
-                                    initialValue="发票"
-                                    options={['发票', '普票', '无票']}
-                                />
-                            </ProForm.Group>
-                            <ProFormUploadButton
-                                extra="支持扩展名：.jpg .zip .doc .wps"
-                                label="倒签报备附件"
-                                name="file"
-                                title="上传文件"
+                            <ProFormSelect
+                                width="md"
+                                options={[
+                                    {
+                                        value: 'time',
+                                        label: '履行完终止',
+                                    },
+                                ]}
+                                name="unusedMode"
+                                label="攻击方法"
                             />
+                            <Parameters config={paraConfig} />
                         </Col>
                         <Col span={7}>
+                            <Trigger />
                         </Col>
                     </Row>
                 </ProForm>
