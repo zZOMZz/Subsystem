@@ -34,7 +34,7 @@ const Parameters: React.FC<ParaProps> = ({ config }) => {
                                 </div>
                                 <div>
                                     <InputNumber<string>
-                                        style={{ width: 200 }}
+                                        style={{ maxWidth: 160, width: '100%' }}
                                         defaultValue={item.defaultValue}
                                         step={item.step}
                                         stringMode
