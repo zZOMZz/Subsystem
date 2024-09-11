@@ -49,6 +49,18 @@ declare namespace API {
     progress?: number;
   };
 
+  type ListItem = {
+    key?: number;
+    name?: string;
+    beginTime?: string;
+    endTime?: string;
+    status?: number;
+    frame?: string;
+    network?: string;
+    dataset?: string;
+    attack?: string;
+  }
+
   type RuleList = {
     data?: RuleListItem[];
     /** 列表的内容总数 */

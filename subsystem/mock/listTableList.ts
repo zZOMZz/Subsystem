@@ -4,33 +4,27 @@ import { parse } from 'url';
 
 // mock tableListDataSource
 const genList = (current: number, pageSize: number) => {
-  const tableListDataSource: API.RuleListItem[] = [];
+  const tableListDataSource: API.ListItem[] = [];
 
   for (let i = 0; i < pageSize; i += 1) {
     const index = (current - 1) * 10 + i;
     tableListDataSource.push({
       key: index,
-      disabled: i % 6 === 0,
-      href: 'https://ant.design',
-      avatar: [
-        'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
-        'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
-      ][i % 2],
       name: `TradeCode ${index}`,
-      owner: '曲丽丽',
-      desc: '这是一段描述',
-      callNo: Math.floor(Math.random() * 1000),
-      status: Math.floor(Math.random() * 10) % 4,
-      updatedAt: moment().format('YYYY-MM-DD'),
-      createdAt: moment().format('YYYY-MM-DD'),
-      progress: Math.ceil(Math.random() * 100),
+      beginTime: moment().format('YYYY-MM-DD'),
+      endTime: moment().format('YYYY-MM-DD'),
+      status: Math.floor(Math.random() * 10) % 2,
+      frame: 'TensorFlow',
+      network: 'ResNet18',
+      dataset: 'CIFAR10',
+      attack: 'WaNet'
     });
   }
   tableListDataSource.reverse();
   return tableListDataSource;
 };
 
-let tableListDataSource = genList(1, 100);
+let tableListDataSource = genList(1, 60);
 
 function getRule(req: Request, res: Response, u: string) {
   let realUrl = u;
@@ -39,7 +33,7 @@ function getRule(req: Request, res: Response, u: string) {
   }
   const { current = 1, pageSize = 10 } = req.query;
   const params = parse(realUrl, true).query as unknown as API.PageParams &
-    API.RuleListItem & {
+    API.ListItem & {
       sorter: any;
       filter: any;
     };
@@ -48,11 +42,13 @@ function getRule(req: Request, res: Response, u: string) {
     ((current as number) - 1) * (pageSize as number),
     (current as number) * (pageSize as number),
   );
+
+  console.log('dataSource', dataSource);
   if (params.sorter) {
     const sorter = JSON.parse(params.sorter);
     dataSource = dataSource.sort((prev, next) => {
       let sortNumber = 0;
-      (Object.keys(sorter) as Array<keyof API.RuleListItem>).forEach((key) => {
+      (Object.keys(sorter) as Array<keyof API.ListItem>).forEach((key) => {
         let nextSort = next?.[key] as number;
         let preSort = prev?.[key] as number;
         if (sorter[key] === 'descend') {
@@ -78,7 +74,7 @@ function getRule(req: Request, res: Response, u: string) {
     };
     if (Object.keys(filter).length > 0) {
       dataSource = dataSource.filter((item) => {
-        return (Object.keys(filter) as Array<keyof API.RuleListItem>).some((key) => {
+        return (Object.keys(filter) as Array<keyof API.ListItem>).some((key) => {
           if (!filter[key]) {
             return true;
           }
@@ -122,21 +118,17 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
     case 'post':
       (() => {
         const i = Math.ceil(Math.random() * 10000);
-        const newRule: API.RuleListItem = {
+        const newRule: API.ListItem = {
           key: tableListDataSource.length,
-          href: 'https://ant.design',
-          avatar: [
-            'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
-            'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
-          ][i % 2],
           name,
-          owner: '曲丽丽',
-          desc,
-          callNo: Math.floor(Math.random() * 1000),
+          beginTime: moment().format('YYYY-MM-DD'),
+          endTime: moment().format('YYYY-MM-DD'),
           status: Math.floor(Math.random() * 10) % 2,
-          updatedAt: moment().format('YYYY-MM-DD'),
-          createdAt: moment().format('YYYY-MM-DD'),
-          progress: Math.ceil(Math.random() * 100),
+          frame: 'TensorFlow',
+          network: 'ResNet18',
+          dataset: 'CIFAR10',
+          attack: 'WaNet'
+          
         };
         tableListDataSource.unshift(newRule);
         return res.json(newRule);

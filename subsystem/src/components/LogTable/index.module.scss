@@ -1,0 +1,10 @@
+.params {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 14px;
+
+    .item {
+        min-width: 200px;
+        margin-left: 88px;
+    }
+}

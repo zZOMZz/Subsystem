@@ -2,7 +2,6 @@ import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
-    FooterToolbar,
     ModalForm,
     PageContainer,
     ProDescriptions,
@@ -11,11 +10,11 @@ import {
     ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
+import { Button, Drawer, Input, message, Collapse, CollapseProps } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
-
+import styles from './index.module.scss'
+import TableCard from './components/tableCard';
 /**
  * @en-US Add node
  * @zh-CN 添加节点
@@ -111,288 +110,215 @@ const LogTable: React.FC = () => {
         {
             title: (
                 <FormattedMessage
-                    id="pages.searchTable.updateForm.ruleName.nameLabel"
-                    defaultMessage="Rule name"
+                    id="pages.searchTable.serial"
+                    defaultMessage="serial number"
                 />
             ),
-            dataIndex: 'name',
-            // tip: 'The rule name is the unique key',
-            render: (dom, entity) => {
-                return (
-                    <a
-                        onClick={() => {
-                            setCurrentRow(entity);
-                            setShowDetail(true);
-                        }}
-                    >
-                        {dom}
-                    </a>
-                );
-            },
+            dataIndex: 'serial',
+            valueType: 'index',
+            width: 60,
         },
         {
-            title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
-            dataIndex: 'desc',
-            valueType: 'textarea',
-        },
-        {
-            title: (
-                <FormattedMessage
-                    id="pages.searchTable.titleCallNo"
-                    defaultMessage="Number of service calls"
-                />
-            ),
-            dataIndex: 'callNo',
+            title: <FormattedMessage id="pages.searchTable.beginTime" defaultMessage="beginTime" />,
+            dataIndex: 'beginTime',
             sorter: true,
-            hideInForm: true,
-            renderText: (val: string) =>
-                `${val}${intl.formatMessage({
-                    id: 'pages.searchTable.tenThousand',
-                    defaultMessage: ' 万 ',
-                })}`,
+            valueType: 'dateTime',
+            width: 200,
         },
         {
-            title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
+            title: <FormattedMessage id="pages.searchTable.endTime" defaultMessage="endTime" />,
+            dataIndex: 'endTime',
+            sorter: true,
+            valueType: 'dateTime',
+            width: 200,
+        },
+        {
+            title: <FormattedMessage id="pages.searchTable.status" defaultMessage="Status" />,
             dataIndex: 'status',
-            hideInForm: true,
             valueEnum: {
                 0: {
                     text: (
                         <FormattedMessage
-                            id="pages.searchTable.nameStatus.default"
-                            defaultMessage="Shut down"
+                            id="pages.searchTable.status.finished"
+                            defaultMessage="finish"
                         />
                     ),
                     status: 'Default',
                 },
                 1: {
                     text: (
-                        <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
+                        <FormattedMessage id="pages.searchTable.status.unfinished" defaultMessage="unfinished" />
                     ),
                     status: 'Processing',
-                },
-                2: {
-                    text: (
-                        <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
-                    ),
-                    status: 'Success',
-                },
-                3: {
-                    text: (
-                        <FormattedMessage
-                            id="pages.searchTable.nameStatus.abnormal"
-                            defaultMessage="Abnormal"
-                        />
-                    ),
-                    status: 'Error',
-                },
+                }
             },
+            width: 100,
         },
         {
             title: (
                 <FormattedMessage
-                    id="pages.searchTable.titleUpdatedAt"
-                    defaultMessage="Last scheduled time"
+                    id="pages.searchTable.frame"
+                    defaultMessage="selected frame"
                 />
             ),
-            sorter: true,
-            dataIndex: 'updatedAt',
-            valueType: 'dateTime',
-            renderFormItem: (item, { defaultRender, ...rest }, form) => {
-                const status = form.getFieldValue('status');
-                if (`${status}` === '0') {
-                    return false;
-                }
-                if (`${status}` === '3') {
-                    return (
-                        <Input
-                            {...rest}
-                            placeholder={intl.formatMessage({
-                                id: 'pages.searchTable.exception',
-                                defaultMessage: 'Please enter the reason for the exception!',
-                            })}
-                        />
-                    );
-                }
-                return defaultRender(item);
-            },
+            dataIndex: 'frame',
+            valueType: 'text',
         },
         {
-            title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
-            dataIndex: 'option',
+            title: <FormattedMessage id="pages.searchTable.network" defaultMessage="network constructor" />,
+            dataIndex: 'network',
+            valueType: 'text',
+        },
+        {
+            title: (
+                <FormattedMessage
+                    id="pages.searchTable.dataset"
+                    defaultMessage="dataset"
+                />
+            ),
+            dataIndex: 'dataset',
+            valueType: 'text',
+        },
+        {
+            title: (
+                <FormattedMessage
+                    id="pages.searchTable.attack"
+                    defaultMessage="attack methods"
+                />
+            ),
+            dataIndex: 'attack',
+            valueType: 'text',
+        },
+        {
+            title: (
+                <FormattedMessage
+                    id="pages.searchTable.trigger"
+                    defaultMessage="trigger"
+                />
+            ),
+            dataIndex: 'trigger',
             valueType: 'option',
-            render: (_, record) => [
-                <a
-                    key="config"
-                    onClick={() => {
-                        handleUpdateModalOpen(true);
-                        setCurrentRow(record);
-                    }}
-                >
-                    <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
-                </a>,
-                <a key="subscribeAlert" href="https://procomponents.ant.design/">
-                    <FormattedMessage
-                        id="pages.searchTable.subscribeAlert"
-                        defaultMessage="Subscribe to alerts"
-                    />
-                </a>,
-            ],
+            render: () => {
+                return (
+                    <Button type='link'>查看</Button>
+                )
+            },
+            width: 100,
+        },
+        {
+            title: (
+                <FormattedMessage
+                    id="pages.searchTable.operate"
+                    defaultMessage="operate"
+                />
+            ),
+            dataIndex: 'operate',
+            valueType: 'option',
+            render: () => {
+                return (
+                    <>
+                        <Button type='link'>下载</Button>
+                        <Button type='link'>删除</Button>
+                    </>
+                )
+            }
         },
     ];
 
+    // TODO: Collapse组件的items数据
+    type preParamsType = {
+        mean: number[],
+        std: number[],
+        scale: number[],
+        inputSize: number[]
+    }
+    const preParams: preParamsType = {
+        mean: [0.4914, 0.4822, 0.4465],
+        std: [0.2023, 0.1994, 0.2010],
+        scale: [0, 1],
+        inputSize: [32, 32],
+    }
+    type paramsType = {
+        [key: string]: number
+    }
+
+    const params: paramsType = {
+        grid_s: 0.5,
+        batch_size: 128,
+        epochs: 200,
+        poisoned_portion: 0.1,
+        grid_k: 4,
+        cross_ratio: 0.2,
+        learning_rate: 0.01,
+        target_label: 0
+    }
+
+    const preParamsContent = (preParams: preParamsType) => {
+        return (
+            <div className={styles['params']}>
+                <span className={styles['item']} >
+                    <span>mean:[{preParams.mean.join(', ')}]</span>
+                </span>
+                <span className={styles['item']}>
+                    <span>std:[{preParams.std.join(', ')}]</span>
+                </span>
+                <span className={styles['item']}>
+                    <span>scale:[{preParams.scale.join(', ')}]</span>
+                </span>
+                <span className={styles['item']}>
+                    <span>inputSize:[{preParams.inputSize.join(', ')}]</span>
+                </span>
+            </div>
+        )
+    }
+        
+
+    const paramsContent = (params: paramsType) => {
+        return (
+            <div className={styles['params']}>
+                {
+                    Object.keys(params).map((key) => {
+                        return <span key={key} className={styles['item']} >{key}:{params[key]}</span>
+                    })
+                }
+            </div>
+        )
+    }
+    const items: CollapseProps['items'] = [
+        {
+            key: '1',
+            label: '预处理参数',
+            children: preParamsContent(preParams),
+        },
+        {
+            key: '2',
+            label: '参数',
+            children: paramsContent(params),
+        },
+    ];
+
+
+    const expandedRowRender = () => {
+        return (
+            <>
+                <Collapse items={items} bordered={false} defaultActiveKey={['1']} />
+                <TableCard />
+            </>
+        )
+    }
+
     return (
-        <PageContainer>
-            <ProTable<API.RuleListItem, API.PageParams>
-                headerTitle={intl.formatMessage({
-                    id: 'pages.searchTable.title',
-                    defaultMessage: 'Enquiry form',
-                })}
+        <PageContainer header={{ title: null }}>
+            <ProTable<API.ListItem, API.PageParams>
                 actionRef={actionRef}
                 rowKey="key"
-                // search={{
-                //     labelWidth: 120,
-                // }}
-                // toolBarRender={() => [
-                //     <Button
-                //         type="primary"
-                //         key="primary"
-                //         onClick={() => {
-                //             handleModalOpen(true);
-                //         }}
-                //     >
-                //         <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-                //     </Button>,
-                // ]}
-                toolBarRender={false}
                 search={false}
                 request={rule}
                 columns={columns}
-                rowSelection={{
-                    onChange: (_, selectedRows) => {
-                        setSelectedRows(selectedRows);
-                    },
-                }}
-
+                toolBarRender={false}
+                expandable={{expandedRowRender}}
+                tableLayout='fixed'
             />
-            {selectedRowsState?.length > 0 && (
-                <FooterToolbar
-                    extra={
-                        <div>
-                            <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}
-                            <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-                            <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
-                            &nbsp;&nbsp;
-                            <span>
-                                <FormattedMessage
-                                    id="pages.searchTable.totalServiceCalls"
-                                    defaultMessage="Total number of service calls"
-                                />{' '}
-                                {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-                                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
-                            </span>
-                        </div>
-                    }
-                >
-                    <Button
-                        onClick={async () => {
-                            await handleRemove(selectedRowsState);
-                            setSelectedRows([]);
-                            actionRef.current?.reloadAndRest?.();
-                        }}
-                    >
-                        <FormattedMessage
-                            id="pages.searchTable.batchDeletion"
-                            defaultMessage="Batch deletion"
-                        />
-                    </Button>
-                    <Button type="primary">
-                        <FormattedMessage
-                            id="pages.searchTable.batchApproval"
-                            defaultMessage="Batch approval"
-                        />
-                    </Button>
-                </FooterToolbar>
-            )}
-            <ModalForm
-                title={intl.formatMessage({
-                    id: 'pages.searchTable.createForm.newRule',
-                    defaultMessage: 'New rule',
-                })}
-                width="400px"
-                open={createModalOpen}
-                onOpenChange={handleModalOpen}
-                onFinish={async (value) => {
-                    const success = await handleAdd(value as API.RuleListItem);
-                    if (success) {
-                        handleModalOpen(false);
-                        if (actionRef.current) {
-                            actionRef.current.reload();
-                        }
-                    }
-                }}
-            >
-                <ProFormText
-                    rules={[
-                        {
-                            required: true,
-                            message: (
-                                <FormattedMessage
-                                    id="pages.searchTable.ruleName"
-                                    defaultMessage="Rule name is required"
-                                />
-                            ),
-                        },
-                    ]}
-                    width="md"
-                    name="name"
-                />
-                <ProFormTextArea width="md" name="desc" />
-            </ModalForm>
-            <UpdateForm
-                onSubmit={async (value) => {
-                    const success = await handleUpdate(value);
-                    if (success) {
-                        handleUpdateModalOpen(false);
-                        setCurrentRow(undefined);
-                        if (actionRef.current) {
-                            actionRef.current.reload();
-                        }
-                    }
-                }}
-                onCancel={() => {
-                    handleUpdateModalOpen(false);
-                    if (!showDetail) {
-                        setCurrentRow(undefined);
-                    }
-                }}
-                updateModalOpen={updateModalOpen}
-                values={currentRow || {}}
-            />
-
-            <Drawer
-                width={600}
-                open={showDetail}
-                onClose={() => {
-                    setCurrentRow(undefined);
-                    setShowDetail(false);
-                }}
-                closable={false}
-            >
-                {currentRow?.name && (
-                    <ProDescriptions<API.RuleListItem>
-                        column={2}
-                        title={currentRow?.name}
-                        request={async () => ({
-                            data: currentRow || {},
-                        })}
-                        params={{
-                            id: currentRow?.name,
-                        }}
-                        columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
-                    />
-                )}
-            </Drawer>
         </PageContainer>
     );
 };

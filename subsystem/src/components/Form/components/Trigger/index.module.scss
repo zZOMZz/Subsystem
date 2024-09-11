@@ -1,0 +1,27 @@
+.radio_group {
+    box-sizing: border-box;
+    .radio_button {
+        padding: 0 !important;
+        width: 46px;
+        height: 46px;
+        .inner_img {
+            height: 46px;
+            width: 46px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .check_img {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+
+    :global {
+        .ant-radio-button-wrapper-checked {
+            border: 0.5px solid #3873fa;
+        }
+    }
+}
+

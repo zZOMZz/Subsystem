@@ -64,4 +64,16 @@ export default {
   'pages.searchTable.tenThousand': '万',
   'pages.searchTable.batchDeletion': '批量删除',
   'pages.searchTable.batchApproval': '批量审批',
+  'pages.searchTable.serial': '序号',
+  'pages.searchTable.beginTime': '启动时间',
+  'pages.searchTable.endTime': '完成时间',
+  'pages.searchTable.status': '状态',
+  'pages.searchTable.status.finished': '已完成',
+  'pages.searchTable.status.unfinished': '未完成',
+  'pages.searchTable.frame': '框架',
+  'pages.searchTable.network': '网络结构',
+  'pages.searchTable.dataset': '数据集',
+  'pages.searchTable.attack': '攻击方法',
+  'pages.searchTable.trigger': '触发器',
+  'pages.searchTable.operate': '操作'
 };
