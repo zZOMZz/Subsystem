@@ -4,7 +4,8 @@ import { useState } from "react";
 import { TabInputConfig } from "../../index";
 
 
-const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal}) => {
+
+const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, onChange}) => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const handleOk = () => {
         setIsModalOpen(false)
@@ -19,9 +20,9 @@ const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal}) 
             className={styles['tabInput_item']}
         >
             <Button className={styles['form-item_topButton']} type="link" size="small" onClick={() => setIsModalOpen(true)}>{ buttonText }</Button>
-            <Radio.Group className={styles['form-item_radioGroup']} buttonStyle="solid" >
+            <Radio.Group className={styles['form-item_radioGroup']} buttonStyle="solid" onChange={(e) => { onChange(e.target.value) }}>
                 {config.map((item: any) => 
-                    <div className={styles['form-item_radioItem']}><Radio.Button value={item.value} >{ item.label }</Radio.Button></div>
+                    <div className={styles['form-item_radioItem']}><Radio.Button value={item} >{ item }</Radio.Button></div>
                 )}
             </Radio.Group>
             {

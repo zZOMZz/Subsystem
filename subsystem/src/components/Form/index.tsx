@@ -1,18 +1,12 @@
 import {
     PageContainer,
     ProForm,
-    ProFormDateRangePicker,
-    ProFormDigit,
     ProFormRadio,
     ProFormSelect,
-    ProFormText,
-    ProFormTextArea,
-    ProFormUploadButton,
 } from '@ant-design/pro-components';
 import { Card, Radio , Modal, Upload, message} from 'antd';
-import { Button, Col, Form, Input, Row, Select, Space, theme } from 'antd';
+import { Button, Col, Form, Input, Row } from 'antd';
 import TabInput from './components/TabInput';
-import { values } from 'lodash';
 import PreParameters from './components/Preprocessing';
 import Parameters from './components/Parameters';
 import Trigger from './components/Trigger';
@@ -21,6 +15,7 @@ import React, { useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { GetProp, UploadProps } from 'antd';
 
+
 interface modalConfig {
     isModalOpen: boolean,
     handleCancel: () => void,
@@ -28,13 +23,11 @@ interface modalConfig {
 }
 
 export interface TabInputConfig {
-    config: {
-        value: string;
-        label: string;
-    }[],
+    config: string[],
     label: string,
     buttonText: string
     modal: React.FC<modalConfig>
+    onChange: (value: string) => void
 }
 // 添加网络模型modal
 const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk }) => {
@@ -169,89 +162,105 @@ const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk 
         </Modal>
     )
 }
+const netConfigInit = ['DenseNet121', 'MobileNetV2', 'VGG11', 'ResNet18']
+const datasetInit = ['GTSRB', 'CIFAR10']
+
+export interface DatasetParams {
+    mean: number[];
+    std: number[];
+    scale: number[];
+    inputsize: number[];
+}
+
+// 预处理参数默认值
+const defaultPreParams: Record<string, DatasetParams> = {
+    CIFAR10: {
+        mean: [0.4914, 0.4822, 0.4465],
+        std: [0.2023, 0.1994, 0.201],
+        scale: [0, 1],
+        inputsize: [32, 32]
+    },
+    GTSRB: {
+        mean: [0.3337, 0.3064, 0.3171],
+        std: [0.2672, 0.2564, 0.2629],
+        scale: [0, 1],
+        inputsize: [32, 32]
+    }
+}
+
+interface attackOption {
+    value: string,
+    label: string
+}
+// 攻击方法
+const attackMethods: Record<'PyTorch' | 'TensorFlow', attackOption[]> = {
+    PyTorch: [
+        {
+            value: 'BadNet',
+            label: 'BadNet'
+        },
+        {
+            value: 'TrojanNet',
+            label: 'TrojanNet'
+        },
+        {
+            value: 'WaNet',
+            label: 'WaNet'
+        },
+        {
+            value: 'TrojanNN',
+            label: 'TrojanNN'
+        }
+    ],
+    TensorFlow: [
+        {
+            value: 'BadNet',
+            label: 'BadNet'
+        },
+        {
+            value: 'TrojanNet',
+            label: 'TrojanNet'
+        },
+        {
+            value: 'WaNet',
+            label: 'WaNet'
+        }
+    ]
+}
 
 export const DefaultForm: React.FC = () => {
-    const newConfig = [
-        {
-            value: 'DenseNet121',
-            label: 'DenseNet121'
-        },
-        {
-            value: 'MobileNetV2',
-            label: 'MobileNetV2'
-        },
-        {
-            value: 'VGG11',
-            label: 'VGG11'
-        },
-        {
-            value: 'ResNet18',
-            label: 'ResNet18'
-        }
-    ]
+    const [frame, setFrame] = useState<'PyTorch' | 'TensorFlow'>('PyTorch');
+    
+    const [networkConfig, setNetworkConfig] = useState<string[]>(netConfigInit);
+    const [network, setNetwork] = useState<string>('');
+    const [datasetConfig, setDatasetConfig] = useState<string[]>(datasetInit);
+    const [dataset, setDataset] = useState<string>('');
 
-    const dataConfig = [
-        {
-            value: 'GTSRB',
-            label: 'GTSRB'
-        },
-        {
-            value: 'CIFAR10',
-            label: 'CIFAR10'
-        }
-    ]
+    const [preParams, setPreParams] = useState<DatasetParams>();
 
-    const paraConfig = [
-        {
-            name: 'target_label',
-            label: '目标类别',
-            defaultValue: '1',
-            step: '0.1',
-        },
-        {
-            name: 'poisoned_portion',
-            label: '投毒率',
-            defaultValue: '0.1',
-            step: '0.1',
-        },
-        {
-            name: 'trigger_size',
-            label: '触发器尺寸',
-            defaultValue: '3',
-            step: '1',
-        },
-        {
-            name: 'trigger_h',
-            label: '触发器纵向位置',
-            defaultValue: '0',
-            step: '1',
-        },
-        {
-            name: 'trigger_w',
-            label: '触发器横向位置',
-            defaultValue: '0',
-            step: '1',
-        },
-        {
-            name: 'epoch',
-            label: '训练轮数',
-            defaultValue: '150',
-            step: '1',
-        },
-        {
-            name: 'batch_size',
-            label: '训练批次大小',
-            defaultValue: '256',
-            step: '1',
-        },
-        {
-            name: 'learning_rate',
-            label: '学习率',
-            defaultValue: '0.001',
-            step: '0.0001',
-        },
-    ]
+    const [attackMethod, setAttackMethod] = useState<string>('');
+    const [attackMethodConfig, setAttackMethodConfig] = useState<attackOption[]>([]);
 
+    const handleFrame = (value: 'PyTorch'|'TensorFlow') => {
+        setFrame(value);
+        setAttackMethodConfig(attackMethods[value]);
+    }
+
+    // 添加新的网络结构
+    const addNetwork = (value: string) => {
+        setNetworkConfig([...network, value])
+    }
+    // 添加新的数据集
+    const addDataset = (value: string) => {
+        setDatasetConfig([...dataset, value])
+    }
+
+    const handleDataset = (value: string) => {
+        setDataset(value);
+        setPreParams(defaultPreParams[value]);
+    }
+
+    
     return (
         <PageContainer header={{ title: null }}>
             <Card>
@@ -266,24 +275,21 @@ export const DefaultForm: React.FC = () => {
                                 name="invoiceType"
                                 initialValue=""
                                 options={['PyTorch', 'TensorFlow']}
+                                fieldProps={{ onChange: (e) => { handleFrame(e.target.value)} }}
                             />
-                            <TabInput config={newConfig} label='网络结构' buttonText='添加网络结构' modal={NetWorkModal} />
-                            <TabInput config={dataConfig} label='数据集' buttonText='添加数据集'  modal={DataModal}/>
-                            <PreParameters />
+                            <TabInput config={networkConfig} label='网络结构' buttonText='添加网络结构' modal={NetWorkModal} onChange={setNetwork} />
+                            <TabInput config={datasetConfig} label='数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} />
+                            <PreParameters defaultValue={preParams} onPreParametersChange={setPreParams} />
                         </Col>
                         <Col span={8}>
                             <ProFormSelect
                                 width="md"
-                                options={[
-                                    {
-                                        value: 'time',
-                                        label: '履行完终止',
-                                    },
-                                ]}
+                                options={attackMethodConfig}
                                 name="unusedMode"
                                 label="攻击方法"
+                                onChange={setAttackMethod}
                             />
-                            <Parameters config={paraConfig} />
+                            <Parameters attackMethod={attackMethod} />
                         </Col>
                         <Col span={7}>
                             <Trigger />

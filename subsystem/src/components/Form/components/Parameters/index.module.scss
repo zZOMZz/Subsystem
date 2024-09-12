@@ -1,8 +1,9 @@
 .para_card {
     padding: 0px;
+    max-width: 380px;
     .para_list {
         padding: 0;
-        height: 380px;
+        height: 320px;
         overflow: hidden;
         &:hover {
             overflow-y: auto;

@@ -108,94 +108,62 @@ const LogTable: React.FC = () => {
 
     const columns: ProColumns<API.RuleListItem>[] = [
         {
-            title: (
-                <FormattedMessage
-                    id="pages.searchTable.serial"
-                    defaultMessage="serial number"
-                />
-            ),
+            title: '序号',
             dataIndex: 'serial',
             valueType: 'index',
             width: 60,
         },
         {
-            title: <FormattedMessage id="pages.searchTable.beginTime" defaultMessage="beginTime" />,
+            title: '开始时间',
             dataIndex: 'beginTime',
             sorter: true,
             valueType: 'dateTime',
             width: 200,
         },
         {
-            title: <FormattedMessage id="pages.searchTable.endTime" defaultMessage="endTime" />,
+            title: '完成时间',
             dataIndex: 'endTime',
             sorter: true,
             valueType: 'dateTime',
             width: 200,
         },
         {
-            title: <FormattedMessage id="pages.searchTable.status" defaultMessage="Status" />,
+            title: '状态',
             dataIndex: 'status',
             valueEnum: {
                 0: {
-                    text: (
-                        <FormattedMessage
-                            id="pages.searchTable.status.finished"
-                            defaultMessage="finish"
-                        />
-                    ),
+                    text: '未完成',
                     status: 'Default',
                 },
                 1: {
-                    text: (
-                        <FormattedMessage id="pages.searchTable.status.unfinished" defaultMessage="unfinished" />
-                    ),
+                    text: '已完成',
                     status: 'Processing',
                 }
             },
             width: 100,
         },
         {
-            title: (
-                <FormattedMessage
-                    id="pages.searchTable.frame"
-                    defaultMessage="selected frame"
-                />
-            ),
+            title: '框架',
             dataIndex: 'frame',
             valueType: 'text',
         },
         {
-            title: <FormattedMessage id="pages.searchTable.network" defaultMessage="network constructor" />,
+            title: '网络结构',
             dataIndex: 'network',
             valueType: 'text',
         },
         {
-            title: (
-                <FormattedMessage
-                    id="pages.searchTable.dataset"
-                    defaultMessage="dataset"
-                />
-            ),
+            title: '数据集',
             dataIndex: 'dataset',
             valueType: 'text',
         },
         {
-            title: (
-                <FormattedMessage
-                    id="pages.searchTable.attack"
-                    defaultMessage="attack methods"
-                />
-            ),
+            title: '攻击方法',
             dataIndex: 'attack',
             valueType: 'text',
         },
         {
-            title: (
-                <FormattedMessage
-                    id="pages.searchTable.trigger"
-                    defaultMessage="trigger"
-                />
-            ),
+            title: '触发器',
             dataIndex: 'trigger',
             valueType: 'option',
             render: () => {
@@ -206,12 +174,7 @@ const LogTable: React.FC = () => {
             width: 100,
         },
         {
-            title: (
-                <FormattedMessage
-                    id="pages.searchTable.operate"
-                    defaultMessage="operate"
-                />
-            ),
+            title: '操作',
             dataIndex: 'operate',
             valueType: 'option',
             render: () => {
