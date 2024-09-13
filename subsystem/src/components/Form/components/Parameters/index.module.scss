@@ -1,6 +1,7 @@
 .para_card {
     padding: 0px;
     max-width: 380px;
+    height: 380px;
     .para_list {
         padding: 0;
         height: 320px;
@@ -51,6 +52,11 @@
         }
     }
 
-  
+    .para_desc {
+        position: absolute;
+        top: 45%;
+        right: 40%;
+        color: #b0b7cc;
+    }
 }
 

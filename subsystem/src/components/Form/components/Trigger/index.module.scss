@@ -18,14 +18,33 @@
         }
     }
 
+    .delete_img {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
     :global {
+        
+        .ant-radio-button-wrapper {
+            margin: 10px 10px 0 10px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 0;
+        }
+
         .ant-radio-button-wrapper-checked {
             border: 0.5px solid #3873fa;
         }
+    }
+}
 
-        .ant-radio-button-wrapper {
-            margin: 10px 10px 0 10px;
-        }
+.upload {
+    position: absolute;
+    top: -34px;
+    right: 0;
+    .upload_button {
+        font-size: 12px;
     }
 }
 

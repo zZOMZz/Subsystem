@@ -1,0 +1,94 @@
+.network-modal {
+    .modal-top {
+        margin-top: 20px;
+
+        .top_span {
+            display: inline-block;
+            width: 150px;
+        }
+
+        :global {
+            .ant-form-item {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .modal-upload {
+        margin-top: 20px;
+
+        :global {
+            .ant-btn {
+                padding: 0;
+            }
+        }
+    }
+
+    .modal-tips {
+        margin-top: 20px;
+
+        .tip_list {
+            padding: 0;
+
+            .tip_item {
+                margin-top: 10px;
+                font-size: 12px;
+                color: #999;
+            }
+        }
+    }
+}
+
+.dataset-modal {
+
+    .dataset_span {
+        display: inline-block;
+        width: 150px;
+    }
+
+    .dataset-name {
+        margin-top: 20px;
+    }
+
+    .dataset-img {
+        margin-top: 10px;
+
+        :global {
+            .ant-upload-wrapper {
+                display: inline-block;
+            }
+        }
+    }
+
+    .dataset-upload {
+        margin-top: 10px;
+
+        :global {
+            .ant-form-item-control-input {
+                min-height: 22px;
+            }
+        }
+    }
+
+    .dataset-input {
+        margin-top: 10px;
+    }
+
+    .dataset-tips {
+        .tip_list {
+            padding: 0;
+
+            .tip_item {
+                margin-top: 10px;
+                font-size: 12px;
+                color: #999;
+            }
+        }
+    }
+
+    :global {
+        .ant-form-item {
+            margin-bottom: 10px;
+        }
+    }
+}

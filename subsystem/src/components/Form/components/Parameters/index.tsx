@@ -1,9 +1,11 @@
 import { Form, Card, InputNumber } from "antd"
 import styles from './index.module.scss'
 import { includes } from "lodash";
+import { useEffect } from "react";
 
 interface ParaProps {
     attackMethod: string;
+    handleParams: (value: Record<string, any>) => void;
 }
 
 const paraConfig = [
@@ -11,7 +13,7 @@ const paraConfig = [
         name: 'target_label',
         label: '目标类别',
         defaultValue: '1',
-        step: '0.1',
+        step: '1',
         includes: ['BadNet', 'TrojanNet', 'TrojanNN', 'WaNet']
     },
     {
@@ -113,8 +115,98 @@ const paraConfig = [
     }
 ]
 
+const defaultValue: Record<string,any> = {
+    BadNet: {
+        target_label: '0',
+        poisoned_portion: '0.1',
+        trigger_size: '3',
+        trigger_h: '0',
+        trigger_w: '0',
+        epoch: '150',
+        batch_size: '256',
+        learning_rate: '0.001',
+    },
+    TrojanNet: {
+        target_label: '0',
+        trigger_size: '3',
+        select_point: '3',
+        trigger_h: '0',
+        trigger_w: '0',
+        epoch: '500',
+        batch_size: '128',
+        learning_rate: '0.01',
+    },
+    TrojanNN: {
+        target_label: '0',
+        trigger_size: '3',
+        trigger_h: '0',
+        trigger_w: '0',
+        epoch: '100',
+        batch_size: '256',
+        learning_rate: '0.001',
+        neuron_num: '2',
+        neuron_epoch: '500',
+    },
+    WaNet: {
+        target_label: '0',
+        poisoned_portion: '0.1',
+        epoch: '500',
+        batch_size: '128',
+        learning_rate: '0.01',
+        grid_s: '0.5',
+        grid_k: '4',
+        cross_ratio: '0.2',
+    }
+}
 
-const Parameters: React.FC<ParaProps> = ({ attackMethod }) => {
+const paraList: React.FC<ParaProps> = ({ attackMethod, handleParams }) => {
+
+    useEffect(() => {
+        handleParams(defaultValue[attackMethod])
+    },[attackMethod])
+
+    if (!attackMethod) {
+        return <span className={styles['para_desc']}>请选择攻击方法</span>
+    } else {
+        return (
+            <ul className={styles['para_list']}>
+                {
+                    paraConfig.map(item => {
+                        if (!includes(item.includes, attackMethod)) {
+                            return null
+                        }
+
+                        return (
+                            <li
+                                key={item.name}
+                                className={styles['para_item']}
+                            >
+                                <div
+                                    className={styles['para_explain']}
+                                >
+                                    <span className={styles['explain_name']}>{item.name}</span>
+                                    <span className={styles['explain_main']}>{item.label}</span>
+                                </div>
+                                <div>
+                                    <InputNumber<string>
+                                        style={{ maxWidth: 160, width: '100%' }}
+                                        defaultValue={defaultValue[attackMethod][item.name]}
+                                        step={item.step}
+                                        stringMode
+                                        onChange={(value) => { handleParams({ [item.name]: value }) }}
+                                    />
+                                </div>
+                            </li>
+                        )
+                    })
+                }
+            </ul>
+        )
+    }
+}
+
+
+const Parameters: React.FC<ParaProps> = ({ attackMethod, handleParams }) => {
     
 
     return (
@@ -125,37 +217,9 @@ const Parameters: React.FC<ParaProps> = ({ attackMethod }) => {
             <Card
                 className={styles['para_card']}
             >
-                <ul className={styles['para_list']}>
-                    {
-                        paraConfig.map(item => {
-                            if (!includes(item.includes, attackMethod)) {
-                                return null
-                            }
-
-                            return (
-                                <li
-                                    key={item.name}
-                                    className={styles['para_item']}
-                                >
-                                    <div
-                                        className={styles['para_explain']}
-                                    >
-                                        <span className={styles['explain_name']}>{item.name}</span>
-                                        <span className={styles['explain_main']}>{item.label}</span>
-                                    </div>
-                                    <div>
-                                        <InputNumber<string>
-                                            style={{ maxWidth: 160, width: '100%' }}
-                                            defaultValue={item.defaultValue}
-                                            step={item.step}
-                                            stringMode
-                                        />
-                                    </div>
-                                </li>
-                            )
-                        })
-                    }
-                </ul>
+                {
+                    paraList({ attackMethod, handleParams })
+                }
             </Card>
         </Form.Item>
     )

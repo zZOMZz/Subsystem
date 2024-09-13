@@ -5,7 +5,7 @@ import { TabInputConfig } from "../../index";
 
 
 
-const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, onChange}) => {
+const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, onChange, action}) => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const handleOk = () => {
         setIsModalOpen(false)
@@ -26,7 +26,7 @@ const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, o
                 )}
             </Radio.Group>
             {
-                modal({isModalOpen, handleCancel, handleOk})
+                modal({isModalOpen, handleCancel, handleOk, action})
             }
         </Form.Item>
     );
