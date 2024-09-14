@@ -1,7 +1,7 @@
 import { Form, Input } from 'antd'
 import styles from './index.module.scss'
 import { mean, set } from 'lodash'
-import { DatasetParams } from '../../index'
+import { DatasetParams } from '../../AttackForm'
 import { useState, useEffect } from 'react'
 interface PreParametersProps {
     defaultValue: DatasetParams | undefined;
@@ -78,6 +78,7 @@ const PreParameters: React.FC<PreParametersProps> = ({ defaultValue, onPreParame
     return (
         <Form
             form={form}
+            className={styles['pre_form']}
         >
             <Form.Item
                 label="预处理参数"

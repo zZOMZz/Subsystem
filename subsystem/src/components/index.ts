@@ -6,6 +6,8 @@
  * 布局组件
  */
 import LogTable from './LogTable';
-import { DefaultForm } from './Form'
+import { AttackForm } from './Form/AttackForm'
+import { ModalForm } from './Form/ModalForm'
+import { SampleForm } from './Form/SampleForm';
 
-export { LogTable, DefaultForm };
+export { LogTable, AttackForm, ModalForm, SampleForm };

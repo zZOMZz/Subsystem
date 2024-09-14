@@ -20,7 +20,28 @@
         position: relative;
         display: inline-block;
 
-       
+       .delete_img {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            cursor: pointer;
+            z-index: 9999;
+            display: none;
+        }
+
+        .desc {
+            display: inline-block;
+            width: 155px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        &:hover {
+            .delete_img {
+                display: block;
+            }
+        }
     }
 
     :global {

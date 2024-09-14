@@ -1,8 +1,8 @@
-import { LogTable, DefaultForm } from "@/components";
+import { LogTable, AttackForm } from "@/components";
 const attack: React.FC = () => {
     return (
         <>
-            <DefaultForm />
+            <AttackForm />
             <LogTable />
         </>
     );

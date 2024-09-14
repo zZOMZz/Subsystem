@@ -1,8 +1,8 @@
-import { LogTable, DefaultForm } from "@/components";
+import { LogTable, SampleForm } from "@/components";
 const sample: React.FC = () => {
     return (
         <>
-            <DefaultForm />
+            <SampleForm />
             <LogTable />
         </>
     );
