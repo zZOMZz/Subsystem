@@ -4,7 +4,7 @@ import styles from './index.module.scss'
 const { TextArea } = Input
 
 
-const tableCard = () => {
+const AttackCard = () => {
     return (
         <Card>
             <Row> 
@@ -45,4 +45,4 @@ const tableCard = () => {
     )
 }
 
-export default tableCard
+export default AttackCard

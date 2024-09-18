@@ -5,7 +5,7 @@ import { TabInputConfig } from "../../AttackForm";
 
 
 
-const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, onChange, action, deleteAction}) => {
+const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, onChange, action, deleteAction, example, selected}) => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const handleOk = () => {
         setIsModalOpen(false)
@@ -15,7 +15,6 @@ const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, o
     }
 
     const handleDelete = (value: string) => {
-        console.log('handleDelete', value);
         deleteAction(value)
     }
 
@@ -25,7 +24,7 @@ const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, o
             className={styles['tabInput_item']}
         >
             <Button className={styles['form-item_topButton']} type="link" size="small" onClick={() => setIsModalOpen(true)}>{ buttonText }</Button>
-            <Radio.Group className={styles['form-item_radioGroup']} buttonStyle="solid" onChange={(e) => { onChange(e.target.value) }}>
+            <Radio.Group className={styles['form-item_radioGroup']} buttonStyle="solid" onChange={(e) => { onChange(e.target.value)}} value={selected}>
                 {config.map((item: any) => 
                     <div className={styles['form-item_radioItem']}>
                         <Popover content={item.name} trigger="hover">
@@ -38,7 +37,7 @@ const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, o
                 )}
             </Radio.Group>
             {
-                modal({isModalOpen, handleCancel, handleOk, action})
+                modal({isModalOpen, handleCancel, handleOk, action, example})
             }
         </Form.Item>
     );

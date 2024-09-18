@@ -1,9 +1,9 @@
-import { LogTable, SampleForm } from "@/components";
+import { SampleTable, SampleForm } from "@/components";
 const sample: React.FC = () => {
     return (
         <>
             <SampleForm />
-            <LogTable />
+            <SampleTable />
         </>
     );
 }

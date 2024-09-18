@@ -27,24 +27,29 @@ export interface TabInputConfig {
 type InputConfig = {
     name: string,
     custom: boolean
+    dataset?: string
 }[]
 
 const modalConfigInit = [
     {
         name: 'backdoor-CIFAR10-DenseNet121',
-        custom: false
+        custom: false,
+        dataset: 'CIFAR10'
     },
     {
         name: 'clean-CIFAR10-MobileNetV2',
-        custom: false
+        custom: false,
+        dataset: 'CIFAR10'
     },
     {
         name: 'backdoor-GTSRB-VGG11',
-        custom: false
+        custom: false,
+        dataset: 'GTSRB'
     },
     {
         name: 'clean-GTSRB-ResNet18',
-        custom: false
+        custom: false,
+        dataset: 'GTSRB'
     }
 ]
 const datasetInit = [
@@ -175,6 +180,11 @@ export const ModalForm: React.FC = () => {
 
     const handleModal = (value: string) => {
         setModal(value);
+        const item = modalConfig.find(item => item.name === value)
+        if (item && item.dataset) {
+            console.log('item.dataset', item.dataset);
+            handleDataset(item.dataset)
+        }
     }
 
     const handleDataset = (value: string) => {
@@ -201,6 +211,16 @@ export const ModalForm: React.FC = () => {
         setDatasetConfig(newDatasetConfig)
     }
 
+    const modalExample = {
+        name: '后门模型检测-添加模型.zip',
+        url: ''
+    }
+
+    const datasetExample = {
+        name: '后门模型检测-添加数据集.zip',
+        url: ''
+    }
+
     return (
         <PageContainer header={{ title: null }}>
             <Card>
@@ -224,8 +244,8 @@ export const ModalForm: React.FC = () => {
                                 options={['PyTorch', 'TensorFlow']}
                                 fieldProps={{ onChange: (e) => { handleFrame(e.target.value) } }}
                             />
-                            <TabInput config={modalConfig} label='待测试模型' buttonText='添加模型' modal={AddModal} onChange={handleModal} action={addModal} deleteAction={deleteModal} />
-                            <TabInput config={datasetConfig} label='对应数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} />
+                            <TabInput config={modalConfig} label='待测模型' buttonText='添加模型' modal={AddModal} onChange={handleModal} action={addModal} deleteAction={deleteModal} example={modalExample} selected={modal} />
+                            <TabInput config={datasetConfig} label='对应数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} example={datasetExample} selected={dataset} />
                             <PreParameters defaultValue={preParams} onPreParametersChange={handlePreParams} />
                         </Col>
                         <Col span={8}>

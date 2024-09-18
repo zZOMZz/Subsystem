@@ -1,20 +1,14 @@
 import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
-    ModalForm,
     PageContainer,
-    ProDescriptions,
-    ProFormText,
-    ProFormTextArea,
     ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Drawer, Input, message, Collapse, CollapseProps } from 'antd';
 import React, { useRef, useState } from 'react';
-import type { FormValueType } from './components/UpdateForm';
-import styles from './index.module.scss'
-import TableCard from './components/tableCard';
+// import type { FormValueType } from './components/UpdateForm';
+import styles from './AttackTable.module.scss'
+import SampleCard from './components/tableCard/sampleCard';
 /**
  * @en-US Add node
  * @zh-CN 添加节点
@@ -40,7 +34,7 @@ const handleAdd = async (fields: API.RuleListItem) => {
  *
  * @param fields
  */
-const handleUpdate = async (fields: FormValueType) => {
+const handleUpdate = async (fields: any) => {
     const hide = message.loading('Configuring');
     try {
         await updateRule({
@@ -99,12 +93,6 @@ const LogTable: React.FC = () => {
     const actionRef = useRef<ActionType>();
     const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
     const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
-
-    /**
-     * @en-US International configuration
-     * @zh-CN 国际化配置
-     * */
-    const intl = useIntl();
 
     const columns: ProColumns<API.RuleListItem>[] = [
         {
@@ -234,7 +222,7 @@ const LogTable: React.FC = () => {
             </div>
         )
     }
-        
+
 
     const paramsContent = (params: paramsType) => {
         return (
@@ -265,7 +253,7 @@ const LogTable: React.FC = () => {
         return (
             <>
                 <Collapse items={items} bordered={false} defaultActiveKey={['1']} />
-                <TableCard />
+                <SampleCard />
             </>
         )
     }
@@ -279,7 +267,7 @@ const LogTable: React.FC = () => {
                 request={rule}
                 columns={columns}
                 toolBarRender={false}
-                expandable={{expandedRowRender}}
+                expandable={{ expandedRowRender }}
                 tableLayout='fixed'
             />
         </PageContainer>

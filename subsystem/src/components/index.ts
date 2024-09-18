@@ -5,9 +5,11 @@
 /**
  * 布局组件
  */
-import LogTable from './LogTable';
+import AttackTable from './LogTable/AttackTable';
+import ModalTable from './LogTable/ModalTable';
+import SampleTable from './LogTable/SampleTable';
 import { AttackForm } from './Form/AttackForm'
 import { ModalForm } from './Form/ModalForm'
 import { SampleForm } from './Form/SampleForm';
 
-export { LogTable, AttackForm, ModalForm, SampleForm };
+export { AttackTable, AttackForm, ModalForm, SampleForm, ModalTable, SampleTable };

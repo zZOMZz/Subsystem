@@ -9,9 +9,13 @@ export interface modalConfig {
     handleCancel: () => void,
     handleOk: () => void
     action: (value: string) => void
+    example: {
+        name: string,
+        url: string
+    }
 }
 // 添加网络模型modal
-export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action}) => {
+export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action,example}) => {
     const [form] = Form.useForm();
     const beforeUpload = (file: File) => {
         const isTxtOrZip = file.type === 'text/plain' || file.type === 'application/zip';
@@ -63,7 +67,7 @@ export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel,
                             <div>net = imp.load_source('net','test.py')</div>
                             <div>model = net.load_model(weight_path='test.pth')</div>
                         </li>
-                        <li className={styles['tip_item']}> 详细的参考示例请点击： <a href="">后门攻击-添加网络结构.zip</a></li>
+                        <li className={styles['tip_item']}> 详细的参考示例请点击： <a href={example.url}>{ example.name }</a></li>
                     </ul>
                 </div>
             </Form>
@@ -73,7 +77,7 @@ export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel,
 
 // 自定义数据集modal
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action }) => {
+export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action,example}) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [imageUrl, setImageUrl] = useState<string>();
@@ -195,8 +199,7 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
                             <li className={styles['tip_item']}>图像:包含训练数据的压缩包,大小不超过500M</li>
                             <li className={styles['tip_item']}>ground-truth labels:一个txt文档,每行包括一个训练图像名称和其真实标签,中间以空格隔开,大小不超过100M<br /> 示例:test.JPEG 0 </li>
                         <li className={styles['tip_item']}>num_classes:数据集的类别总数</li>
-                        {/* TODO: a标签内的文字随不同模块而改变 */}
-                            <li className={styles['tip_item']}> 详细的参考示例请点击:<a href="">后门攻击-添加数据集.zip</a></li>
+                        <li className={styles['tip_item']}> 详细的参考示例请点击: <a href={example.url}>{ example.name }</a></li>
                         </ul>
                     </div>
                 </Form>
@@ -205,8 +208,8 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
     )
 }
 
-// 添加网络模型modal
-export const AddModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action }) => {
+// 添加模型modal
+export const AddModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action, example }) => {
     const [form] = Form.useForm();
     const beforeUpload = (file: File) => {
         const isTxtOrZip = file.type === 'text/plain' || file.type === 'application/zip';
@@ -258,7 +261,7 @@ export const AddModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, han
                             <div>net = imp.load_source('net','test.py')</div>
                             <div>model = net.load_model(weight_path='test.pth')</div>
                         </li>
-                        <li className={styles['tip_item']}> 详细的参考示例请点击： <a href="">后门模型检测-添加模型.zip</a></li>
+                        <li className={styles['tip_item']}> 详细的参考示例请点击： <a href={example.url}>{ example.name }</a></li>
                     </ul>
                 </div>
             </Form>

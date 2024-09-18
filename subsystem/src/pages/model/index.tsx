@@ -1,9 +1,9 @@
-import { LogTable, ModalForm } from "@/components";
+import { ModalTable, ModalForm } from "@/components";
 const model: React.FC = () => {
     return (
         <>
             <ModalForm />
-            <LogTable />
+            <ModalTable />
         </>
     );
 }

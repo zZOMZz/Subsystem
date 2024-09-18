@@ -23,6 +23,11 @@ export interface TabInputConfig {
     onChange: (value: string) => void
     action: (value: string) => void
     deleteAction: (value: string) => void
+    example: {
+        name: string,
+        url: string
+    },
+    selected?: string
 }
 
 type InputConfig = {
@@ -328,7 +333,17 @@ export const AttackForm: React.FC = () => {
     const deleteDataset = (value: string) => {
         const newDatasetConfig = datasetConfig.filter(item => item.name !== value)
         setDatasetConfig(newDatasetConfig)
-    }   
+    }
+
+    const networkExample = {
+        name: '后门攻击-添加网络结构.zip',
+        url: ''
+    }
+
+    const datasetExample = {
+        name: '后门攻击-添加数据集.zip',
+        url: ''
+    }
     
     return (
         <PageContainer header={{ title: null }}>
@@ -353,8 +368,8 @@ export const AttackForm: React.FC = () => {
                                 options={['PyTorch', 'TensorFlow']}
                                 fieldProps={{ onChange: (e) => { handleFrame(e.target.value) } }}
                             />
-                            <TabInput config={networkConfig} label='网络结构' buttonText='添加网络结构' modal={NetWorkModal} onChange={setNetwork} action={addNetwork} deleteAction={deleteNetWork} />
-                            <TabInput config={datasetConfig} label='数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} />
+                            <TabInput config={networkConfig} label='网络结构' buttonText='添加网络结构' modal={NetWorkModal} onChange={setNetwork} action={addNetwork} deleteAction={deleteNetWork} example={networkExample} selected={network} />
+                            <TabInput config={datasetConfig} label='数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} example={datasetExample} selected={dataset} />
                             <PreParameters defaultValue={preParams} onPreParametersChange={setPreParams} />
                         </Col>
                         <Col span={8}>
