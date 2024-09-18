@@ -6,7 +6,9 @@ const { TextArea } = Input
 
 const AttackCard = () => {
     return (
-        <Card>
+        <Card
+            className={styles['attackCard']}
+        >
             <Row> 
                 <Col span={12}>
                     <div>
