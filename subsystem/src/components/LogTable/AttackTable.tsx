@@ -1,13 +1,14 @@
-import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
+import { addRule, removeRule, updateRule } from '@/services/ant-design-pro/api';
+import { attackRule } from '@/services/backdoor/api';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
     PageContainer,
     ProTable,
 } from '@ant-design/pro-components';
-import { Button, Drawer, Input, message, Collapse, CollapseProps } from 'antd';
+import { Button, Drawer, Input, message, Collapse, CollapseProps, ConfigProvider } from 'antd';
 import React, { useRef, useState } from 'react';
 // import type { FormValueType } from './components/UpdateForm';
-import styles from './AttackTable.module.scss'
+import styles from './index.module.scss'
 import AttackCard from './components/tableCard/attackCard';
 /**
  * @en-US Add node
@@ -106,14 +107,12 @@ const LogTable: React.FC = () => {
             dataIndex: 'beginTime',
             sorter: true,
             valueType: 'dateTime',
-            width: 200,
         },
         {
             title: '完成时间',
             dataIndex: 'endTime',
             sorter: true,
             valueType: 'dateTime',
-            width: 200,
         },
         {
             title: '状态',
@@ -128,12 +127,13 @@ const LogTable: React.FC = () => {
                     status: 'Processing',
                 }
             },
-            width: 100,
+            width: 140,
         },
         {
             title: '框架',
             dataIndex: 'frame',
             valueType: 'text',
+            width: 140
         },
         {
             title: '网络结构',
@@ -156,10 +156,10 @@ const LogTable: React.FC = () => {
             valueType: 'option',
             render: () => {
                 return (
-                    <Button type='link'>查看</Button>
+                    <Button type='link' style={{ padding: '0' }}>查看</Button>
                 )
             },
-            width: 100,
+            width: 90,
         },
         {
             title: '操作',
@@ -168,11 +168,12 @@ const LogTable: React.FC = () => {
             render: () => {
                 return (
                     <>
-                        <Button type='link'>下载</Button>
-                        <Button type='link'>删除</Button>
+                        <Button type='link' style={{ padding: '0', marginRight: '20px' }}>下载</Button>
+                        <Button type='link' style={{ padding: '0' }}>删除</Button>
                     </>
                 )
-            }
+            },
+            width: 120
         },
     ];
 
@@ -251,25 +252,37 @@ const LogTable: React.FC = () => {
 
     const expandedRowRender = () => {
         return (
-            <>
-                <Collapse items={items} bordered={false} defaultActiveKey={['1']} />
+            <div>
+                <Collapse items={items} bordered={false} style={{ borderRadius: '0px' }}/>
                 <AttackCard />
-            </>
+            </div>
         )
     }
 
     return (
         <PageContainer header={{ title: null }}>
-            <ProTable<API.ListItem, API.PageParams>
-                actionRef={actionRef}
-                rowKey="key"
-                search={false}
-                request={rule}
-                columns={columns}
-                toolBarRender={false}
-                expandable={{expandedRowRender}}
-                tableLayout='fixed'
-            />
+            <ConfigProvider
+                theme={{
+                    components: {
+                        'Table': {
+                            'headerBg': '#fff',
+                            'headerSplitColor': '#fff'
+                        }
+                    }
+                }}
+            >
+                <ProTable<API.AttackListItem, API.PageParams>
+                    actionRef={actionRef}
+                    rowKey="key"
+                    search={false}
+                    request={attackRule}
+                    columns={columns}
+                    toolBarRender={false}
+                    expandable={{ expandedRowRender, expandedRowClassName : () => styles['expandedRow'], defaultExpandAllRows: false }}
+                    tableLayout='fixed'
+                    style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#fff'}}
+                />
+            </ConfigProvider>
         </PageContainer>
     );
 };

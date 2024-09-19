@@ -1,0 +1,22 @@
+.params {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 14px;
+
+    .item {
+        min-width: 200px;
+        margin-left: 88px;
+    }
+}
+
+.expandedRow {
+    padding: 0 4px 4px 4px;
+    
+
+    :global {
+        .ant-table-cell {
+            padding: 0 !important;
+            background-color: #fff !important;
+        }
+    }
+}

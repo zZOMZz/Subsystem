@@ -60,6 +60,8 @@ export async function rule(
   });
 }
 
+
+
 /** 更新规则 PUT /api/rule */
 export async function updateRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {

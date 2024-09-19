@@ -1,3 +1,25 @@
 .sampleCard {
-    margin-top: 20px;
+    margin-top: 28px;
+    border-radius: 0px;
+    border-bottom: 0;
+    .left_title {
+        font-size: 14px;
+        line-height: 22px;
+        color: #606266;
+    }
+
+    .right_tips {
+        position: absolute;
+        font-size: 12px;
+        line-height: 18px;
+        color: rgb(99,115,135);
+        right: 10px;
+        top: -41px;
+    }
+
+    .pagination {
+        position: absolute;
+        right: 40px;
+        bottom: -10px;
+    }
 }

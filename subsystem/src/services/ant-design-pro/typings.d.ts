@@ -49,7 +49,7 @@ declare namespace API {
     progress?: number;
   };
 
-  type ListItem = {
+  type AttackListItem = {
     key?: number;
     name?: string;
     beginTime?: string;
@@ -59,6 +59,31 @@ declare namespace API {
     network?: string;
     dataset?: string;
     attack?: string;
+  }
+
+  type ModalListItem = {
+    key?: number;
+    name?: string;
+    beginTime?: string;
+    endTime?: string;
+    status?: number;
+    frame?: string;
+    testModel?: string;
+    dataset?: string;
+    detect?: string;
+  }
+
+  type SampleListItem = {
+    key?: number;
+    name?: string;
+    beginTime?: string;
+    endTime?: string;
+    status?: number;
+    frame?: string;
+    sampleNum?: string;
+    model?: string;
+    dataset?: string;
+    detect?: string;
   }
 
   type RuleList = {

@@ -27,15 +27,15 @@ export default [
     component: './attack',
   },
   {
-    path: '/model',
-    name: '后门模型检测',
-    icon: 'Merge',
-    component: './model',
-  },
-  {
     path: '/sample',
     name: '后门样本检测',
     icon: 'FileSearch',
     component: './sample',
+  },
+  {
+    path: '/model',
+    name: '后门模型检测',
+    icon: 'Merge',
+    component: './model',
   }
 ];
