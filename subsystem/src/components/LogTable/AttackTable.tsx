@@ -5,7 +5,7 @@ import {
     PageContainer,
     ProTable,
 } from '@ant-design/pro-components';
-import { Button, Drawer, Input, message, Collapse, CollapseProps, ConfigProvider } from 'antd';
+import { Button, Drawer, Input, message, Collapse, CollapseProps, ConfigProvider, Modal, Image } from 'antd';
 import React, { useRef, useState } from 'react';
 // import type { FormValueType } from './components/UpdateForm';
 import styles from './index.module.scss'
@@ -78,24 +78,12 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
 };
 
 const LogTable: React.FC = () => {
-    /**
-     * @en-US Pop-up window of new window
-     * @zh-CN 新建窗口的弹窗
-     *  */
-    const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-    /**
-     * @en-US The pop-up window of the distribution update window
-     * @zh-CN 分布更新窗口的弹窗
-     * */
-    const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-
-    const [showDetail, setShowDetail] = useState<boolean>(false);
-
     const actionRef = useRef<ActionType>();
-    const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-    const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+    const imgRef = useRef(null);
+    const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+    const [previewTrigger, setPreviewTrigger] = useState<string | undefined>();
 
-    const columns: ProColumns<API.RuleListItem>[] = [
+    const columns: ProColumns<API.AttackListItem>[] = [
         {
             title: '序号',
             dataIndex: 'serial',
@@ -154,9 +142,20 @@ const LogTable: React.FC = () => {
             title: '触发器',
             dataIndex: 'trigger',
             valueType: 'option',
-            render: () => {
+            render: (_, record) => {
+                const hasTrigger = record.trigger !== undefined;
+
                 return (
-                    <Button type='link' style={{ padding: '0' }}>查看</Button>
+                    <Button type='link'
+                        style={{ padding: '0' }}
+                        disabled={!hasTrigger}
+                        onClick={() => {
+                            setPreviewTrigger(record.trigger);
+                            setIsPreviewVisible(true);
+                        }}
+                    >
+                        查看
+                    </Button>
                 )
             },
             width: 90,
@@ -281,6 +280,13 @@ const LogTable: React.FC = () => {
                     expandable={{ expandedRowRender, expandedRowClassName : () => styles['expandedRow'], defaultExpandAllRows: false }}
                     tableLayout='fixed'
                     style={{ padding: '16px', borderRadius: '8px', backgroundColor: '#fff'}}
+                />
+                <Image
+                    preview={{
+                        visible: isPreviewVisible,
+                        onVisibleChange: setIsPreviewVisible
+                    }}
+                    src={previewTrigger || ''}
                 />
             </ConfigProvider>
         </PageContainer>

@@ -59,6 +59,7 @@ declare namespace API {
     network?: string;
     dataset?: string;
     attack?: string;
+    trigger?: string;
   }
 
   type ModalListItem = {

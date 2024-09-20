@@ -2,10 +2,11 @@ import { ConfigProvider, Form, Radio, Upload, Button, UploadFile, message } from
 import { CloseCircleOutlined } from '@ant-design/icons';
 import styles from './index.module.scss'
 import { useState } from 'react'
-import { set, values } from "lodash";
-
+import { triggerConfig } from '../../AttackForm'
 interface TriggerProps {
     handleTrigger: (value: string) => void
+    config: any
+    action: (value: triggerConfig) => void
 }
 
 interface Upload {
@@ -13,25 +14,9 @@ interface Upload {
     fileList: UploadFile[]
 }
 
-const Trigger: React.FC<TriggerProps> = ({ handleTrigger }) => {
+const Trigger: React.FC<TriggerProps> = ({ handleTrigger, config, action }) => {
     const [trigger, setTrigger] = useState('')
-    const [options, setOptions] = useState([
-        {
-            value: 'a',
-            img: '/imgs/BackdoorAttack_trigger_FF.png',
-            custom: false
-        },
-        {
-            value: 'b',
-            img: '/imgs/BackdoorAttack_trigger_10.png',
-            custom: false
-        },
-        {
-            value: 'c',
-            img: '/imgs/BackdoorAttack_trigger_apple.png',
-            custom: false
-        }
-    ])
+    const [options, setOptions] = useState<triggerConfig[]>(config)
 
     const onRadioChange = (e: any) => {
         setTrigger(e.target.value)
@@ -43,15 +28,18 @@ const Trigger: React.FC<TriggerProps> = ({ handleTrigger }) => {
         if (!file.originFileObj) return
 
         if (file.status === 'done') {
+            // TODO: 上传图片返回路径
             const newOption = {
                 value: Date.now().toString(),
                 img: URL.createObjectURL(file.originFileObj),  // "blob:http://localhost:8000/c8fdb687-be89-47b2-a07b-025923ef8904"
-                custom: true
+                custom: true,
+                imgPath: ''
             }
 
             setOptions([newOption, ...options])
 
-            setTrigger(newOption.value)
+            // setTrigger(newOption.value)
+            action(newOption)
             message.success(`${file.name} 上传成功`);
         } else if (file.status === 'error') {
             message.error(`${file.name} 上传失败`);

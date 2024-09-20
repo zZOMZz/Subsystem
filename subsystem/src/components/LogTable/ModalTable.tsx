@@ -78,22 +78,7 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
 };
 
 const LogTable: React.FC = () => {
-    /**
-     * @en-US Pop-up window of new window
-     * @zh-CN 新建窗口的弹窗
-     *  */
-    const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-    /**
-     * @en-US The pop-up window of the distribution update window
-     * @zh-CN 分布更新窗口的弹窗
-     * */
-    const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-
-    const [showDetail, setShowDetail] = useState<boolean>(false);
-
     const actionRef = useRef<ActionType>();
-    const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-    const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
 
     const columns: ProColumns<API.RuleListItem>[] = [
         {

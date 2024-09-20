@@ -8,7 +8,7 @@ export interface modalConfig {
     isModalOpen: boolean,
     handleCancel: () => void,
     handleOk: () => void
-    action: (value: string) => void
+    action: (value: any) => void
     example: {
         name: string,
         url: string
@@ -30,7 +30,12 @@ export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel,
         form.validateFields().then((values) => {
             // TODO: 服务端响应接收到上传的网络结构
             console.log('values', values);
-            action(values.network)
+            const data = {
+                name: values.network,
+                filePath: '',
+                custom: true
+            }
+            action(data)
             form.resetFields()
         })
         handleOk()
@@ -130,14 +135,19 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
     );
 
     const onOk = () => {
-        console.log('onOk');
 
         form.validateFields().then((values) => {
-            // TODO: 服务端响应接收到上传的数据集
-
-            action(values.dataset)
+            // TODO: 服务端响应接收到上传的数据集, 返回imgPath和filePath
+            const data = {
+                name: values.dataset,
+                num_classes: values.num_classes,
+                imgPath: '',
+                filePath: '',
+                custom: true
+            }
             console.log('values', values);
-
+            action(data)
+            
             form.resetFields()
         })
 

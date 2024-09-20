@@ -13,6 +13,8 @@ import Trigger from './components/Trigger';
 import styles from './index.module.scss';
 import React, { useState } from 'react';
 import { modalConfig, DataModal, NetWorkModal } from './components/modal';
+import { addRule } from '@/services/attack/api';
+import { mean, method } from 'lodash';
 
 
 export interface TabInputConfig {
@@ -21,7 +23,7 @@ export interface TabInputConfig {
     buttonText: string
     modal: React.FC<modalConfig>
     onChange: (value: string) => void
-    action: (value: string) => void
+    action: (value: any) => void
     deleteAction: (value: string) => void
     example: {
         name: string,
@@ -35,31 +37,57 @@ type InputConfig = {
     custom: boolean
 }[]
 
+interface networkConfig {
+    name: string,
+    filePath: string,
+    custom: boolean
+}
+
 const netConfigInit = [
     {
         name: 'ResNet18',
+        filePath: 'ResNet18',
         custom: false
     },
     {
         name: 'DenseNet121',
+        filePath: 'DenseNet121',
         custom: false
     },
     {
-        name: 'VGG16',
+        frame: 'TensorFlow',
+        name: 'VGG11',
+        filePath: 'VGG11',
         custom: false
     },
     {
         name: 'MobileNetV2',
+        filePath: 'MobileNetV2',
         custom: false
-    }
+    },
 ]
+
+interface datasetConfig {
+    name: string,
+    imgPath: string,
+    filePath: string,
+    num_classes: number,
+    custom: boolean
+}
+
 const datasetInit = [
     {
         name: 'GTSRB',
+        imgPath: '/Backdoor/data/GTSRB/train',
+        filePath: '/Backdoor/data/GTSRB/train_data.txt',
+        num_classes: 43,
         custom: false
     },
     {
         name: 'CIFAR10',
+        imgPath: '/Backdoor/data/cifar/train',
+        filePath: '/Backdoor/data/cifar/trainLabels.txt',
+        num_classes: 10,
         custom: false
     }
 ]
@@ -70,6 +98,35 @@ export interface DatasetParams {
     scale: number[];
     inputsize: number[];
 }
+
+export interface triggerConfig {
+    value: string,
+    img: string,
+    imgPath: string,
+    custom: boolean
+}
+
+// 触发器配置
+const triggerInit: triggerConfig[] = [
+    {
+        value: 'a',
+        img: '/imgs/BackdoorAttack_trigger_FF.png',
+        imgPath: '/Backdoor/data/BackdoorAttack/triggers/trigger_FF.png',
+        custom: false
+    },
+    {
+        value: 'b',
+        img: '/imgs/BackdoorAttack_trigger_10.png',
+        imgPath: '/Backdoor/data/BackdoorAttack/triggers/trigger_10.png',
+        custom: false
+    },
+    {
+        value: 'c',
+        img: '/imgs/BackdoorAttack_trigger_apple.png',
+        imgPath: '/Backdoor/data/BackdoorAttack/triggers/trigger_apple.png',
+        custom: false
+    }
+]
 
 // 预处理参数默认值
 const defaultPreParams: Record<string, DatasetParams> = {
@@ -282,9 +339,10 @@ export const AttackForm: React.FC = () => {
     const [form] = Form.useForm();
     const [frame, setFrame] = useState<'PyTorch' | 'TensorFlow'>('PyTorch');
     
-    const [networkConfig, setNetworkConfig] = useState<InputConfig>(netConfigInit);
+    const [networkConfig, setNetworkConfig] = useState<networkConfig[]>(netConfigInit);
     const [network, setNetwork] = useState<string>('');
-    const [datasetConfig, setDatasetConfig] = useState<InputConfig>(datasetInit);
+
+    const [datasetConfig, setDatasetConfig] = useState<datasetConfig[]>(datasetInit);
     const [dataset, setDataset] = useState<string>('');
 
     const [preParams, setPreParams] = useState<DatasetParams>();
@@ -293,6 +351,8 @@ export const AttackForm: React.FC = () => {
     const [attackMethodConfig, setAttackMethodConfig] = useState<attackOption[]>([]);
 
     const [params, setParams] = useState<Record<string, number>>({});
+
+    const [triggerConfig, setTriggerConfig] = useState<triggerConfig[]>(triggerInit);
     const [trigger, setTrigger] = useState<string>('');
 
     const handleFrame = (value: 'PyTorch'|'TensorFlow') => {
@@ -301,12 +361,17 @@ export const AttackForm: React.FC = () => {
     }
 
     // 添加新的网络结构
-    const addNetwork = (value: string) => {
-        setNetworkConfig([...networkConfig, { name: value, custom: true }])
+    const addNetwork = (value: networkConfig) => {
+        setNetworkConfig([...networkConfig, value])
     }
     // 添加新的数据集
-    const addDataset = (value: string) => {
-        setDatasetConfig([...datasetConfig, { name: value, custom: true }])
+    const addDataset = (value: datasetConfig) => {
+        setDatasetConfig([...datasetConfig, value])
+    }
+    // 添加新的触发器
+    const addTrigger = (value: triggerConfig) => {
+        console.log('trigger value', value);
+        setTriggerConfig([...triggerConfig, value])
     }
 
     const handleDataset = (value: string) => {
@@ -343,6 +408,38 @@ export const AttackForm: React.FC = () => {
     const datasetExample = {
         name: '后门攻击-添加数据集.zip',
         url: ''
+    }
+
+    const handleStart = async () => {
+        // TODO: Modal中的数据, 各种path
+        let netfilePath = frame === 'PyTorch' ? '/Backdoor/checkpoints/pytorch/BackdoorAttack' : '/Backdoor/checkpoints/tensorflow2/BackdoorAttack';
+        const dataSetItem = datasetConfig.find(item => item.name === dataset) as datasetConfig;
+        const triggerItem = triggerConfig.find(item => item.value === trigger) as triggerConfig;
+        console.log('triggerItem', triggerItem);
+        const data = {
+            frame,
+            ai_type: 1,
+            networkStructure: {
+                filePath: `${netfilePath}/${network}`,
+                name: network
+            },
+            dataset: {
+                name: dataset,
+                imagePath: dataSetItem.imgPath,
+                filePath: dataSetItem.filePath,
+                num_classes: dataSetItem.num_classes,
+            },
+            mean: preParams?.mean,
+            std: preParams?.std,
+            scale: preParams?.scale,
+            inputsize: preParams?.inputsize,
+            method: attackMethod,
+            parameterJson: params,
+            flipFlop: triggerItem.imgPath,
+            outPutPath: ''
+        }
+        console.log('data', data);
+        await addRule(data)
     }
     
     return (
@@ -383,8 +480,14 @@ export const AttackForm: React.FC = () => {
                             <Parameters method={attackMethod} handleParams={ handleParams } paraConfig={paraConfig} defaultValue={defaultValue}/>
                         </Col>
                         <Col span={7}>
-                            { shouldTriggerRender && <Trigger handleTrigger={handleTrigger} /> }
-                            <Button type='primary' style={{ position: 'absolute', bottom: '31px', right: '110px', width: '80px' }}>启动</Button>
+                            {shouldTriggerRender && <Trigger handleTrigger={handleTrigger} config={triggerConfig} action={addTrigger} /> }
+                            <Button
+                                type='primary'
+                                style={{ position: 'absolute', bottom: '31px', right: '110px', width: '80px' }}
+                                onClick={handleStart}
+                            >
+                                启动
+                            </Button>
                         </Col>
                     </Row>
                 </ProForm>

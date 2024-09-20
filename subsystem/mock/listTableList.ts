@@ -18,7 +18,8 @@ const genAttackList = (current: number, pageSize: number) => {
       frame: 'TensorFlow',
       network: 'ResNet18',
       dataset: 'CIFAR10',
-      attack: 'TrojanNet'
+      attack: 'BadNet',
+      trigger: '/imgs/BackdoorAttack_trigger_FF.png'
     });
   }
   tableListDataSource.reverse();

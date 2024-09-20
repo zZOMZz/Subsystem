@@ -174,8 +174,8 @@ export const ModalForm: React.FC = () => {
         setModalConfig([...modalConfig, { name: value, custom: true }])
     }
     // 添加新的数据集
-    const addDataset = (value: string) => {
-        setDatasetConfig([...datasetConfig, { name: value, custom: true }])
+    const addDataset = (value: any) => {
+        // setDatasetConfig([...datasetConfig, { name: value, custom: true }])
     }
 
     const handleModal = (value: string) => {
