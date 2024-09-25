@@ -39,12 +39,19 @@ export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel,
         form.validateFields().then((values) => {
             // TODO: 服务端响应接收到上传的网络结构
             console.log('values', values);
-            const data = {
-                name: values.network,
-                filePath: '',
-                custom: true
+            if (File) {
+                const formData = new FormData();
+                formData.append('file', values.upload.file);
+                uploadFile(formData).then((res) => {
+                    console.log('res', res);
+                    const data = {
+                        name: values.network,
+                        filePath: res.data.filePath,
+                        custom: true
+                    }
+                    action(data)
+                })
             }
-            action(data)
             form.resetFields()
         })
         handleOk()
@@ -103,6 +110,7 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
     };
 
     const beforeUpload = (file: FileType) => {
+        // TODO: 校验上传文件类型和大小
         // const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         // if (!isJpgOrPng) {
         //     message.error('You can only upload JPG/PNG file!');
@@ -127,7 +135,6 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
         //         setImageUrl(url);
         //     });
         // }
-        // TODO: 服务端响应接收到上传的图片
         console.log('info', info);
         getBase64(info.file.originFileObj as FileType, (url) => {
             setLoading(false);
@@ -147,16 +154,28 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
 
         form.validateFields().then((values) => {
             // TODO: 服务端响应接收到上传的数据集, 返回imgPath和filePath
+            console.log('values', values);
+            let imgPath = '';
+            let filePath = '';
+            const formData = new FormData();
+            formData.append('file', values.upload_img.file);
+            uploadFile(formData).then((res) => {
+                imgPath = res.data.filePath
+            })
+            const formData2 = new FormData();
+            formData2.append('file', values.upload_label.file);
+            uploadFile(formData2).then((res) => {
+                filePath = res.data.filePath
+            })
+
             const data = {
                 name: values.dataset,
                 num_classes: values.num_classes,
-                imgPath: '',
-                filePath: '',
+                imgPath,
+                filePath,
                 custom: true
             }
-            console.log('values', values);
             action(data)
-            
             form.resetFields()
         })
 
@@ -169,6 +188,7 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
         handleCancel()
     }
 
+    // 图片上传前校验
     const beforeUploadPic = (file: FileType) => {
 
     }
