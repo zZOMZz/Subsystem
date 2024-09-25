@@ -6,6 +6,7 @@ import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
+import type { RequestConfig } from '@umijs/max';
 import React from 'react';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -135,6 +136,17 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
  * 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
  * @doc https://umijs.org/docs/max/request#配置
  */
-export const request = {
+export const request: RequestConfig = {
   ...errorConfig,
+  requestInterceptors: [
+    // (url, options) => {
+    //   console.log('requestInterceptors', url, options);
+    //   const headers = {
+    //     ...options.headers,
+    //     credentials: 'include',
+    //     'Cookie': '__huid=11fui6NFwshixmVoJpK8PqdoViUATW8ySebR9NF79H4+U=; __guid=59612149.4131415040376211500.1721268684782.5334; __DC_gid=59612149.62913979.1721268684795.1722308980032.6; __gid=206785792.314885609.1722395402142.1722395402142.1; webp=1; _ga=GA1.1.297565680.1722997788; _ga_MY08QYRPTL=GS1.1.1723013138.3.0.1723013138.0.0.0; Q=u%3D360H3481637857%26n%3D%26le%3D%26m%3DZGt5WGWOWGWOWGWOWGWOWGWOZGL4%26qid%3D3481637857%26im%3D1_t0105d6cf9b508f72c8%26src%3Dpcw_newso%26t%3D5; T=s%3D2b635f9a7d01b20ddf2bb12bdf475ebe%26t%3D1727177284%26lm%3D0-4%26lf%3D%26sk%3D161fd2862d2e195569a34a11417ad8fc%26mt%3D1727177284%26rc%3D%26v%3D2.0%26a%3D1; ai-sec-detect-server-conference-prod-cookie=OWFkNzA2NzEtY2FjNi00NzQ1LWFhNjktZTQwNDdiMjFmZjY1',
+    //   };
+    //   return { url, options: { ...options, headers } };
+    // },
+  ],
 };

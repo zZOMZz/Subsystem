@@ -488,10 +488,10 @@ function postSampleRule(req: Request, res: Response, u: string, b: Request) {
 }
 
 export default {
-  'GET /api/rule': getRule,
+  'GET /api/backdoor/attack/find': getRule,
   'POST /api/rule': postRule,
-  'GET /api/modalRule': getModalRule,
+  'GET /api/backdoor/model/find': getModalRule,
   'POST /api/modalRule': postModalRule,
-  'GET /api/sampleRule': getSampleRule,
+  'GET /api/backdoor/sample/find': getSampleRule,
   'POST /api/sampleRule': postSampleRule,
 };

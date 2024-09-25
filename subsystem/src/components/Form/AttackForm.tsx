@@ -11,14 +11,14 @@ import PreParameters from './components/Preprocessing';
 import Parameters from './components/Parameters';
 import Trigger from './components/Trigger';
 import styles from './index.module.scss';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { modalConfig, DataModal, NetWorkModal } from './components/modal';
-import { addRule } from '@/services/attack/api';
-import { mean, method } from 'lodash';
-
+import { addRule, getNetwork, getDataset, getTrigger, creatDataset, creatNetwork, creatTrigger, deleteDataset, deleteNetwork, deleteTrigger } from '@/services/attack/api';
+import { uploadFile } from '@/services/file/api';
+import type { NetworkItem, DatasetItem, TriggerItem} from './type';
 
 export interface TabInputConfig {
-    config: InputConfig,
+    config: InputConfig[],
     label: string,
     buttonText: string
     modal: React.FC<modalConfig>
@@ -35,62 +35,7 @@ export interface TabInputConfig {
 type InputConfig = {
     name: string,
     custom: boolean
-}[]
-
-interface networkConfig {
-    name: string,
-    filePath: string,
-    custom: boolean
 }
-
-const netConfigInit = [
-    {
-        name: 'ResNet18',
-        filePath: 'ResNet18',
-        custom: false
-    },
-    {
-        name: 'DenseNet121',
-        filePath: 'DenseNet121',
-        custom: false
-    },
-    {
-        frame: 'TensorFlow',
-        name: 'VGG11',
-        filePath: 'VGG11',
-        custom: false
-    },
-    {
-        name: 'MobileNetV2',
-        filePath: 'MobileNetV2',
-        custom: false
-    },
-]
-
-interface datasetConfig {
-    name: string,
-    imgPath: string,
-    filePath: string,
-    num_classes: number,
-    custom: boolean
-}
-
-const datasetInit = [
-    {
-        name: 'GTSRB',
-        imgPath: '/Backdoor/data/GTSRB/train',
-        filePath: '/Backdoor/data/GTSRB/train_data.txt',
-        num_classes: 43,
-        custom: false
-    },
-    {
-        name: 'CIFAR10',
-        imgPath: '/Backdoor/data/cifar/train',
-        filePath: '/Backdoor/data/cifar/trainLabels.txt',
-        num_classes: 10,
-        custom: false
-    }
-]
 
 export interface DatasetParams {
     mean: number[];
@@ -98,35 +43,6 @@ export interface DatasetParams {
     scale: number[];
     inputsize: number[];
 }
-
-export interface triggerConfig {
-    value: string,
-    img: string,
-    imgPath: string,
-    custom: boolean
-}
-
-// 触发器配置
-const triggerInit: triggerConfig[] = [
-    {
-        value: 'a',
-        img: '/imgs/BackdoorAttack_trigger_FF.png',
-        imgPath: '/Backdoor/data/BackdoorAttack/triggers/trigger_FF.png',
-        custom: false
-    },
-    {
-        value: 'b',
-        img: '/imgs/BackdoorAttack_trigger_10.png',
-        imgPath: '/Backdoor/data/BackdoorAttack/triggers/trigger_10.png',
-        custom: false
-    },
-    {
-        value: 'c',
-        img: '/imgs/BackdoorAttack_trigger_apple.png',
-        imgPath: '/Backdoor/data/BackdoorAttack/triggers/trigger_apple.png',
-        custom: false
-    }
-]
 
 // 预处理参数默认值
 const defaultPreParams: Record<string, DatasetParams> = {
@@ -339,10 +255,10 @@ export const AttackForm: React.FC = () => {
     const [form] = Form.useForm();
     const [frame, setFrame] = useState<'PyTorch' | 'TensorFlow'>('PyTorch');
     
-    const [networkConfig, setNetworkConfig] = useState<networkConfig[]>(netConfigInit);
+    const [networkConfig, setNetworkConfig] = useState<NetworkItem[]>([]);
     const [network, setNetwork] = useState<string>('');
 
-    const [datasetConfig, setDatasetConfig] = useState<datasetConfig[]>(datasetInit);
+    const [datasetConfig, setDatasetConfig] = useState<DatasetItem[]>([]);
     const [dataset, setDataset] = useState<string>('');
 
     const [preParams, setPreParams] = useState<DatasetParams>();
@@ -352,8 +268,22 @@ export const AttackForm: React.FC = () => {
 
     const [params, setParams] = useState<Record<string, number>>({});
 
-    const [triggerConfig, setTriggerConfig] = useState<triggerConfig[]>(triggerInit);
+    const [triggerConfig, setTriggerConfig] = useState<TriggerItem[]>([]);
     const [trigger, setTrigger] = useState<string>('');
+
+    // 初始化获得network, dataset和trigger
+    useEffect(() => {
+        getNetwork().then(({ data }) => {
+            setNetworkConfig([...data])
+        })
+        getDataset().then(({ data }) => {
+            setDatasetConfig([...data])
+        })
+        getTrigger().then(({ data }) => {
+            setTriggerConfig([...data])
+        })
+    })
+
 
     const handleFrame = (value: 'PyTorch'|'TensorFlow') => {
         setFrame(value);
@@ -361,15 +291,15 @@ export const AttackForm: React.FC = () => {
     }
 
     // 添加新的网络结构
-    const addNetwork = (value: networkConfig) => {
+    const addNetwork = (value: NetworkItem) => {
         setNetworkConfig([...networkConfig, value])
     }
     // 添加新的数据集
-    const addDataset = (value: datasetConfig) => {
+    const addDataset = (value: DatasetItem) => {
         setDatasetConfig([...datasetConfig, value])
     }
     // 添加新的触发器
-    const addTrigger = (value: triggerConfig) => {
+    const addTrigger = (value: TriggerItem) => {
         console.log('trigger value', value);
         setTriggerConfig([...triggerConfig, value])
     }
@@ -413,8 +343,8 @@ export const AttackForm: React.FC = () => {
     const handleStart = async () => {
         // TODO: Modal中的数据, 各种path
         let netfilePath = frame === 'PyTorch' ? '/Backdoor/checkpoints/pytorch/BackdoorAttack' : '/Backdoor/checkpoints/tensorflow2/BackdoorAttack';
-        const dataSetItem = datasetConfig.find(item => item.name === dataset) as datasetConfig;
-        const triggerItem = triggerConfig.find(item => item.value === trigger) as triggerConfig;
+        const dataSetItem = datasetConfig.find(item => item.name === dataset);
+        const triggerItem = triggerConfig.find(item => item.flipName === trigger);
         console.log('triggerItem', triggerItem);
         const data = {
             frame,
@@ -425,9 +355,9 @@ export const AttackForm: React.FC = () => {
             },
             dataset: {
                 name: dataset,
-                imagePath: dataSetItem.imgPath,
-                filePath: dataSetItem.filePath,
-                num_classes: dataSetItem.num_classes,
+                imagePath: dataSetItem?.imagePath,
+                filePath: dataSetItem?.filePath,
+                num_classes: dataSetItem?.numClasses,
             },
             mean: preParams?.mean,
             std: preParams?.std,
@@ -435,11 +365,12 @@ export const AttackForm: React.FC = () => {
             inputsize: preParams?.inputsize,
             method: attackMethod,
             parameterJson: params,
-            flipFlop: triggerItem.imgPath,
+            flipFlop: triggerItem?.flipPath,
             outPutPath: ''
         }
         console.log('data', data);
-        await addRule(data)
+        // TODO: 启动服务
+        // await addRule(data)
     }
     
     return (

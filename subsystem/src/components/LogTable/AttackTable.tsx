@@ -1,12 +1,13 @@
 import { addRule, removeRule, updateRule } from '@/services/ant-design-pro/api';
 import { attackRule } from '@/services/backdoor/api';
+
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
     PageContainer,
     ProTable,
 } from '@ant-design/pro-components';
 import { Button, Drawer, Input, message, Collapse, CollapseProps, ConfigProvider, Modal, Image } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 // import type { FormValueType } from './components/UpdateForm';
 import styles from './index.module.scss'
 import AttackCard from './components/tableCard/attackCard';
@@ -77,9 +78,36 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
     }
 };
 
+// TODO: Collapse组件的items数据
+type preParamsType = {
+    mean: number[],
+    std: number[],
+    scale: number[],
+    inputSize: number[]
+}
+const preParams: preParamsType = {
+    mean: [0.4914, 0.4822, 0.4465],
+    std: [0.2023, 0.1994, 0.2010],
+    scale: [0, 1],
+    inputSize: [32, 32],
+}
+type paramsType = {
+    [key: string]: number
+}
+
+const params: paramsType = {
+    grid_s: 0.5,
+    batch_size: 128,
+    epochs: 200,
+    poisoned_portion: 0.1,
+    grid_k: 4,
+    cross_ratio: 0.2,
+    learning_rate: 0.01,
+    target_label: 0
+}
+
 const LogTable: React.FC = () => {
     const actionRef = useRef<ActionType>();
-    const imgRef = useRef(null);
     const [isPreviewVisible, setIsPreviewVisible] = useState(false);
     const [previewTrigger, setPreviewTrigger] = useState<string | undefined>();
 
@@ -92,19 +120,19 @@ const LogTable: React.FC = () => {
         },
         {
             title: '开始时间',
-            dataIndex: 'beginTime',
+            dataIndex: 'startTime',
             sorter: true,
             valueType: 'dateTime',
         },
         {
             title: '完成时间',
-            dataIndex: 'endTime',
+            dataIndex: 'completeTime',
             sorter: true,
             valueType: 'dateTime',
         },
         {
             title: '状态',
-            dataIndex: 'status',
+            dataIndex: 'state',
             valueEnum: {
                 0: {
                     text: '未完成',
@@ -125,17 +153,17 @@ const LogTable: React.FC = () => {
         },
         {
             title: '网络结构',
-            dataIndex: 'network',
+            dataIndex: 'networkStructure',
             valueType: 'text',
         },
         {
             title: '数据集',
-            dataIndex: 'dataset',
+            dataIndex: 'dataSet',
             valueType: 'text',
         },
         {
             title: '攻击方法',
-            dataIndex: 'attack',
+            dataIndex: 'attackMethod',
             valueType: 'text',
         },
         {
@@ -176,34 +204,7 @@ const LogTable: React.FC = () => {
         },
     ];
 
-    // TODO: Collapse组件的items数据
-    type preParamsType = {
-        mean: number[],
-        std: number[],
-        scale: number[],
-        inputSize: number[]
-    }
-    const preParams: preParamsType = {
-        mean: [0.4914, 0.4822, 0.4465],
-        std: [0.2023, 0.1994, 0.2010],
-        scale: [0, 1],
-        inputSize: [32, 32],
-    }
-    type paramsType = {
-        [key: string]: number
-    }
-
-    const params: paramsType = {
-        grid_s: 0.5,
-        batch_size: 128,
-        epochs: 200,
-        poisoned_portion: 0.1,
-        grid_k: 4,
-        cross_ratio: 0.2,
-        learning_rate: 0.01,
-        target_label: 0
-    }
-
+    
     const preParamsContent = (preParams: preParamsType) => {
         return (
             <div className={styles['params']}>

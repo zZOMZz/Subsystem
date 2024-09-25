@@ -3,6 +3,8 @@ import styles from './index.module.scss'
 import type { GetProp, UploadProps } from 'antd';
 import { useEffect, useState } from "react";
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { uploadFile } from "@/services/file/api";
+import { UploadFile } from "antd/lib";
 
 export interface modalConfig {
     isModalOpen: boolean,
@@ -17,12 +19,19 @@ export interface modalConfig {
 // 添加网络模型modal
 export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action,example}) => {
     const [form] = Form.useForm();
-    const beforeUpload = (file: File) => {
+    const [File, setFile] = useState<UploadFile>();
+
+    const handleUploadChange = (file: UploadFile) => {
+        console.log('onChange', file);
+        setFile(file)
+    }
+
+    const beforeUpload = async (file: File) => {
         const isTxtOrZip = file.type === 'text/plain' || file.type === 'application/zip';
         if (!isTxtOrZip) {
             message.error('只能上传txt或zip文件');
         }
-        return isTxtOrZip || Upload.LIST_IGNORE
+        return true
     }
 
     const onOk = () => {
@@ -58,7 +67,7 @@ export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel,
                     </Form.Item>
                 </div>
                 <Form.Item name='upload' className={styles['modal-upload']}>
-                    <Upload beforeUpload={beforeUpload}>
+                    <Upload beforeUpload={beforeUpload} maxCount={1} onChange={(info) => { handleUploadChange(info.file) }}>
                         <Button type="link">上传本地网络结构文件</Button>
                     </Upload>
                 </Form.Item>
@@ -160,6 +169,10 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
         handleCancel()
     }
 
+    const beforeUploadPic = (file: FileType) => {
+
+    }
+
 
     return (
         <Modal title="添加自定义数据集" open={isModalOpen} onOk={onOk} onCancel={onCancel} className={styles['dataset-modal']}>
@@ -178,10 +191,8 @@ export const DataModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, ha
                             <Upload
                                 name="avatar"
                                 listType="picture-card"
-                                className="avatar-uploader"
                                 showUploadList={false}
-                                action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-                                beforeUpload={beforeUpload}
+                                beforeUpload={beforeUploadPic}
                                 onChange={handleChange}
                             >
                                 {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}

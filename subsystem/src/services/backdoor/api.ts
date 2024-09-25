@@ -10,13 +10,22 @@ export async function attackRule(
     },
     options?: { [key: string]: any },
 ) {
-    return request<API.RuleList>('/api/rule', {
+    const res = await request('/api/backdoor/attack/find', {
         method: 'GET',
         params: {
-            ...params,
+            // TODO: 转换参数
+            // ...params,
+            size: '10',
+            page: '0',
         },
         ...(options || {}),
     });
+    console.log('res', res);
+    return {
+        data: res.result.content,
+        total: res.result.totalElements,
+        success: true
+    }
 }
 
 export async function modalRule(
@@ -29,10 +38,11 @@ export async function modalRule(
     },
     options?: { [key: string]: any },
 ) {
-    return request<API.RuleList>('/api/modalRule', {
+    return request<API.RuleList>('/api/backdoor/model/find', {
         method: 'GET',
         params: {
-            ...params,
+            size: '10',
+            page: '0'
         },
         ...(options || {}),
     });
@@ -48,11 +58,14 @@ export async function sampleRule(
     },
     options?: { [key: string]: any },
 ) {
-    return request<API.RuleList>('/api/sampleRule', {
+    return request<API.RuleList>('/api/backdoor/sample/find', {
         method: 'GET',
         params: {
-            ...params,
+            size: params.pageSize,
+            
         },
         ...(options || {}),
     });
 }
+
+
