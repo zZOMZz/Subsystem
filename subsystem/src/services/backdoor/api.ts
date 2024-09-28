@@ -20,7 +20,7 @@ export async function attackRule(
         },
         ...(options || {}),
     });
-    console.log('res', res);
+    console.log('table rules res', res);
     return {
         data: res.result.content,
         total: res.result.totalElements,
@@ -38,7 +38,7 @@ export async function modalRule(
     },
     options?: { [key: string]: any },
 ) {
-    return request<API.RuleList>('/api/backdoor/model/find', {
+    const res = await request('/api/backdoor/model/find', {
         method: 'GET',
         params: {
             size: '10',
@@ -46,6 +46,13 @@ export async function modalRule(
         },
         ...(options || {}),
     });
+
+    console.log('modal rules res', res);
+    return {
+        data: res.result.content,
+        total: res.result.totalElements,
+        success: true
+    }
 }
 
 export async function sampleRule(
@@ -58,14 +65,21 @@ export async function sampleRule(
     },
     options?: { [key: string]: any },
 ) {
-    return request<API.RuleList>('/api/backdoor/sample/find', {
+    const res = await request('/api/backdoor/sample/find', {
         method: 'GET',
         params: {
-            size: params.pageSize,
-            
+            size: '10',
+            page: '0'
         },
         ...(options || {}),
     });
+
+    console.log('sample rules res', res);
+    return {
+        data: res.result.content,
+        total: res.result.totalElements,
+        success: true
+    }
 }
 
 

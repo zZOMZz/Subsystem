@@ -12,9 +12,11 @@ import Parameters from './components/Parameters';
 import Trigger from './components/Trigger';
 import TestSamples from './components/samples';
 import styles from './index.module.scss';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { modalConfig, DataModal, AddModal } from './components/modal';
 import { includes } from 'lodash';
+import type { DatasetItem, ModelItem } from './type';
+import { getSampleModal, addRule } from '@/services/sample/api';
 
 
 export interface TabInputConfig {
@@ -32,29 +34,6 @@ type InputConfig = {
     custom: boolean,
     dataset?: string
 }[]
-
-const modalConfigInit = [
-    {
-        name: 'CIFAR10-DenseNet121',
-        dataset: 'CIFAR10',
-        custom: false
-    },
-    {
-        name: 'GTSRB-VGG11',
-        dataset: 'GTSRB',
-        custom: false
-    }
-]
-const datasetInit = [
-    {
-        name: 'GTSRB',
-        custom: false
-    },
-    {
-        name: 'CIFAR10',
-        custom: false
-    }
-]
 
 export interface DatasetParams {
     mean: number[];
@@ -126,10 +105,11 @@ export const SampleForm: React.FC = () => {
     const [form] = Form.useForm();
     const [frame, setFrame] = useState<'PyTorch'>('PyTorch');
 
-    const [modalConfig, setModalConfig] = useState<InputConfig>(modalConfigInit);
-    const [modal, setModal] = useState<string>('');
-    const [datasetConfig, setDatasetConfig] = useState<InputConfig>(datasetInit);
-    const [dataset, setDataset] = useState<string>('');
+    const [modelConfig, setModelConfig] = useState<ModelItem[]>([]);
+    const [model, setModel] = useState<ModelItem>();
+
+    const [datasetConfig, setDatasetConfig] = useState<DatasetItem[]>([]);
+    const [dataset, setDataset] = useState<DatasetItem>();
 
     const [preParams, setPreParams] = useState<DatasetParams>();
 
@@ -139,22 +119,30 @@ export const SampleForm: React.FC = () => {
     const [params, setParams] = useState<Record<string, number>>({});
     const [trigger, setTrigger] = useState<string>('');
 
+    useEffect(() => {
+        getSampleModal().then(res => {
+            setModelConfig(res.data)
+        })
+    }, [])
+
     const handleFrame = (value: 'PyTorch') => {
         setFrame(value);
         setDetectMethodConfig(detectMethods[value]);
     }
 
     // 添加新的网络结构
-    const addModal = (value: string) => {
-        setModalConfig([...modalConfig, { name: value, custom: true }])
+    const addModal = (value: ModelItem) => {
+
+        setModelConfig([...modelConfig, value ])
     }
     // 添加新的数据集
-    const addDataset = (value: any) => {
-        setDatasetConfig([...datasetConfig, { name: value, custom: true }])
+    const addDataset = (value: DatasetItem) => {
+        setDatasetConfig([...datasetConfig, value])
     }
 
     const handleDataset = (value: string) => {
-        setDataset(value);
+        // TODO: 数据绑定
+        // setDataset(value);
         setPreParams(defaultPreParams[value]);
     }
 
@@ -164,15 +152,16 @@ export const SampleForm: React.FC = () => {
     }
 
     const handleModal = (value: string) => {
-        setModal(value);
-        if (modalConfigInit.some(item => item.name === value)) {
-            setPreParams(defaultPreParams[modalConfigInit.find(item => item.name === value)?.dataset as string])
-        }
+        // TODO: 模型绑定
+        // setModal(value);
+        // if (modalConfigInit.some(item => item.name === value)) {
+        //     setPreParams(defaultPreParams[modalConfigInit.find(item => item.name === value)?.dataset as string])
+        // }
     }
 
     const deleteModal = (value: string) => {
-        const newModalConfig = modalConfig.filter(item => item.name !== value)
-        setModalConfig(newModalConfig)
+        const newModalConfig = modelConfig.filter(item => item.name !== value)
+        setModelConfig(newModalConfig)
     }
 
     const deleteDataset = (value: string) => {
@@ -214,7 +203,7 @@ export const SampleForm: React.FC = () => {
                                 fieldProps={{ onChange: (e) => { handleFrame(e.target.value) } }}
                             />
                             <TestSamples choseImg={handleModal} />
-                            <TabInput config={modalConfig} label='测试模型' buttonText='添加模型' modal={AddModal} onChange={handleModal} action={addModal} deleteAction={deleteModal} example={sampleExample} selected={modal} />
+                            <TabInput config={modelConfig} label='测试模型' buttonText='添加模型' modal={AddModal} onChange={handleModal} action={addModal} deleteAction={deleteModal} example={sampleExample} selected={model?.id} />
                             {/* <TabInput config={datasetConfig} label='对应数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} example={datasetExample}/> */}
                             <PreParameters defaultValue={preParams} onPreParametersChange={setPreParams} />
                         </Col>

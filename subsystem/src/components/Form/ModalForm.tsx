@@ -10,8 +10,12 @@ import TabInput from './components/TabInput';
 import PreParameters from './components/Preprocessing';
 import Parameters from './components/Parameters';
 import styles from './index.module.scss';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { modalConfig, DataModal, AddModal } from './components/modal';
+import { getTestModal, addRule } from '@/services/model/api';
+import { getDataset } from '@/services/attack/api';
+import type { ModelItem, DatasetItem } from './type';
+import model from '@/pages/model';
 
 
 export interface TabInputConfig {
@@ -29,39 +33,6 @@ type InputConfig = {
     custom: boolean
     dataset?: string
 }[]
-
-const modalConfigInit = [
-    {
-        name: 'backdoor-CIFAR10-DenseNet121',
-        custom: false,
-        dataset: 'CIFAR10'
-    },
-    {
-        name: 'clean-CIFAR10-MobileNetV2',
-        custom: false,
-        dataset: 'CIFAR10'
-    },
-    {
-        name: 'backdoor-GTSRB-VGG11',
-        custom: false,
-        dataset: 'GTSRB'
-    },
-    {
-        name: 'clean-GTSRB-ResNet18',
-        custom: false,
-        dataset: 'GTSRB'
-    }
-]
-const datasetInit = [
-    {
-        name: 'GTSRB',
-        custom: false
-    },
-    {
-        name: 'CIFAR10',
-        custom: false
-    }
-]
 
 export interface DatasetParams {
     mean: number[];
@@ -152,10 +123,11 @@ export const ModalForm: React.FC = () => {
     const [form] = Form.useForm();
     const [frame, setFrame] = useState<'PyTorch' | 'TensorFlow'>('PyTorch');
 
-    const [modalConfig, setModalConfig] = useState<InputConfig>(modalConfigInit);
-    const [modal, setModal] = useState<string>('');
-    const [datasetConfig, setDatasetConfig] = useState<InputConfig>(datasetInit);
-    const [dataset, setDataset] = useState<string>('');
+    const [modalConfig, setModalConfig] = useState<ModelItem[]>([]);
+    const [modal, setModal] = useState<ModelItem>();
+
+    const [datasetConfig, setDatasetConfig] = useState<DatasetItem[]>([]);
+    const [dataset, setDataset] = useState<DatasetItem>();
 
     const [preParams, setPreParams] = useState<DatasetParams>();
 
@@ -169,27 +141,39 @@ export const ModalForm: React.FC = () => {
         setAttackMethodConfig(modalMethods[value]);
     }
 
+    useEffect(() => {
+        getTestModal().then(res => {
+            setModalConfig(res.data)
+        })
+        getDataset().then(res => {
+            setDatasetConfig(res.data)
+        })
+    }, [])
+
     // 添加新的网络结构
     const addModal = (value: string) => {
-        setModalConfig([...modalConfig, { name: value, custom: true }])
+        setModalConfig([...modalConfig])
     }
     // 添加新的数据集
     const addDataset = (value: any) => {
         // setDatasetConfig([...datasetConfig, { name: value, custom: true }])
     }
 
-    const handleModal = (value: string) => {
-        setModal(value);
-        const item = modalConfig.find(item => item.name === value)
-        if (item && item.dataset) {
-            console.log('item.dataset', item.dataset);
-            handleDataset(item.dataset)
-        }
+    const handleModal = (id: string) => {
+        const item = modalConfig.find(item => item.id === id)
+        setModal(item);
+        // TODO: 绑定dataset
+        // if (item && item.dataset) {
+        //     console.log('item.dataset', item.dataset);
+        //     handleDataset(item.dataset)
+        // }
     }
 
-    const handleDataset = (value: string) => {
-        setDataset(value);
-        setPreParams(defaultPreParams[value]);
+    const handleDataset = (id: string) => {
+        const item = datasetConfig.find(item => item.id === id)
+        setDataset(item);
+        // TODO: 设置预处理参数
+        // setPreParams(defaultPreParams[value]);
     }
 
     const handlePreParams = (value: DatasetParams) => {
@@ -221,6 +205,26 @@ export const ModalForm: React.FC = () => {
         url: ''
     }
 
+    const handleStart = () => {
+        const data = {
+            frame,
+            modelTestId: modal?.id,
+            modelTest: modal?.name,
+            dataSetId: dataset?.id,
+            dataSet: dataset?.name,
+            mean: preParams?.mean.join(','),
+            std: preParams?.std.join(','),
+            scale: preParams?.scale.join(','),
+            inputSize: preParams?.inputsize.join(','),
+            detectionMethod: detectMethod,
+            detectionMethodId: "",
+            parameterJson: JSON.stringify(params)
+        } 
+        console.log('data', data);
+        // TODO: 发送请求
+        // await addRule(data)
+    }
+
     return (
         <PageContainer header={{ title: null }}>
             <Card>
@@ -244,8 +248,8 @@ export const ModalForm: React.FC = () => {
                                 options={['PyTorch', 'TensorFlow']}
                                 fieldProps={{ onChange: (e) => { handleFrame(e.target.value) } }}
                             />
-                            <TabInput config={modalConfig} label='待测模型' buttonText='添加模型' modal={AddModal} onChange={handleModal} action={addModal} deleteAction={deleteModal} example={modalExample} selected={modal} />
-                            <TabInput config={datasetConfig} label='对应数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} example={datasetExample} selected={dataset} />
+                            <TabInput config={modalConfig} label='待测模型' buttonText='添加模型' modal={AddModal} onChange={handleModal} action={addModal} deleteAction={deleteModal} example={modalExample} selected={modal?.id} />
+                            <TabInput config={datasetConfig} label='对应数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} example={datasetExample} selected={dataset?.id} />
                             <PreParameters defaultValue={preParams} onPreParametersChange={handlePreParams} />
                         </Col>
                         <Col span={8}>
@@ -259,7 +263,10 @@ export const ModalForm: React.FC = () => {
                             <Parameters method={detectMethod} handleParams={handleParams} paraConfig={paraConfig} defaultValue={defaultValue} />
                         </Col>
                         <Col span={7}>
-                            <Button type='primary' style={{ position: 'absolute', bottom: '31px', right: '110px', width: '80px' }}>启动</Button>
+                            <Button type='primary'
+                                style={{ position: 'absolute', bottom: '31px', right: '110px', width: '80px' }}
+                                onClick={handleStart}
+                            >启动</Button>
                         </Col>
                     </Row>
                 </ProForm>

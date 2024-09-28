@@ -28,7 +28,7 @@ const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, o
                 {config.map((item: any) => 
                     <div className={styles['form-item_radioItem']}>
                         <Popover content={item.name} trigger="hover">
-                            <Radio.Button value={item.name} >
+                            <Radio.Button value={item.id} >
                                 <span className={styles['desc']}>{item.name}</span>
                             </Radio.Button>
                         </Popover>

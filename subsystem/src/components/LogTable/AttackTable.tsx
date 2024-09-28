@@ -205,27 +205,28 @@ const LogTable: React.FC = () => {
     ];
 
     
-    const preParamsContent = (preParams: preParamsType) => {
+    const preParamsContent = (record: any) => {
         return (
             <div className={styles['params']}>
                 <span className={styles['item']} >
-                    <span>mean:[{preParams.mean.join(', ')}]</span>
+                    <span>mean:[{record.mean}]</span>
                 </span>
                 <span className={styles['item']}>
-                    <span>std:[{preParams.std.join(', ')}]</span>
+                    <span>std:[{record.std}]</span>
                 </span>
                 <span className={styles['item']}>
-                    <span>scale:[{preParams.scale.join(', ')}]</span>
+                    <span>scale:[{record.scale}]</span>
                 </span>
                 <span className={styles['item']}>
-                    <span>inputSize:[{preParams.inputSize.join(', ')}]</span>
+                    <span>inputSize:[{record.inputSize}]</span>
                 </span>
             </div>
         )
     }
         
 
-    const paramsContent = (params: paramsType) => {
+    const paramsContent = (record: any) => {
+        const params = JSON.parse(record.parameterJson);
         return (
             <div className={styles['params']}>
                 {
@@ -236,25 +237,27 @@ const LogTable: React.FC = () => {
             </div>
         )
     }
-    const items: CollapseProps['items'] = [
-        {
-            key: '1',
-            label: '预处理参数',
-            children: preParamsContent(preParams),
-        },
-        {
-            key: '2',
-            label: '参数',
-            children: paramsContent(params),
-        },
-    ];
+   
+    const expandedRowRender = (record: any) => {
+        console.log('record:', record);
 
+        const items: CollapseProps['items'] = [
+            {
+                key: '1',
+                label: '预处理参数',
+                children: preParamsContent(record),
+            },
+            {
+                key: '2',
+                label: '参数',
+                children: paramsContent(record),
+            },
+        ];
 
-    const expandedRowRender = () => {
         return (
             <div>
                 <Collapse items={items} bordered={false} style={{ borderRadius: '0px' }}/>
-                <AttackCard />
+                <AttackCard jsonObject={ record.jsonObject } />
             </div>
         )
     }

@@ -55,3 +55,21 @@ export interface TriggerItem {
     id: string
     custom: boolean
 }
+
+export interface ModelItem {
+    userId: string
+    type: number
+    initCorrelation: any
+    name: string
+    modelName: string
+    pyModelPath: string
+    tenPresetPath: any
+    deleted: boolean
+    enabled: number
+    createdBy: string
+    createdTime: string
+    lastModifyBy: string
+    lastModifyTime: string
+    id: string
+    custom: boolean
+}

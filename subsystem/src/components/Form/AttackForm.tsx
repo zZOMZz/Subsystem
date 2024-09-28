@@ -256,10 +256,10 @@ export const AttackForm: React.FC = () => {
     const [frame, setFrame] = useState<'PyTorch' | 'TensorFlow'>('PyTorch');
     
     const [networkConfig, setNetworkConfig] = useState<NetworkItem[]>([]);
-    const [network, setNetwork] = useState<string>('');
+    const [network, setNetwork] = useState<NetworkItem>();
 
     const [datasetConfig, setDatasetConfig] = useState<DatasetItem[]>([]);
-    const [dataset, setDataset] = useState<string>('');
+    const [dataset, setDataset] = useState<DatasetItem>();
 
     const [preParams, setPreParams] = useState<DatasetParams>();
 
@@ -279,11 +279,13 @@ export const AttackForm: React.FC = () => {
         getDataset().then(({ data }) => {
             setDatasetConfig([...data])
         })
-        getTrigger().then(({ data }) => {
-            setTriggerConfig([...data])
-        })
-    })
 
+        // TODO: 获得trigger
+        // getTrigger().then(({ data }) => {
+        //     console.log('trigger', data);
+        //     // setTriggerConfig([...data])
+        // })
+    },[])
 
     const handleFrame = (value: 'PyTorch'|'TensorFlow') => {
         setFrame(value);
@@ -291,7 +293,9 @@ export const AttackForm: React.FC = () => {
     }
 
     // 添加新的网络结构
-    const addNetwork = (value: NetworkItem) => {
+    const addNetwork = async (value: NetworkItem) => {
+        // TODO: 添加新的网络结构
+        const res = await creatNetwork(value)
         setNetworkConfig([...networkConfig, value])
     }
     // 添加新的数据集
@@ -300,12 +304,11 @@ export const AttackForm: React.FC = () => {
     }
     // 添加新的触发器
     const addTrigger = (value: TriggerItem) => {
-        console.log('trigger value', value);
         setTriggerConfig([...triggerConfig, value])
     }
 
     const handleDataset = (value: string) => {
-        setDataset(value);
+        setDataset(datasetConfig.find(item => item.id === value));
         setPreParams(defaultPreParams[value]);
     }
 
@@ -340,36 +343,31 @@ export const AttackForm: React.FC = () => {
         url: ''
     }
 
+    const handleNetwork = (value: string) => {
+        console.log('chose network', networkConfig.find(item => item.id === value));
+        setNetwork(networkConfig.find(item => item.id === value))
+    }
+
+    // TODO: 启动按钮
     const handleStart = async () => {
-        // TODO: Modal中的数据, 各种path
-        let netfilePath = frame === 'PyTorch' ? '/Backdoor/checkpoints/pytorch/BackdoorAttack' : '/Backdoor/checkpoints/tensorflow2/BackdoorAttack';
-        const dataSetItem = datasetConfig.find(item => item.name === dataset);
         const triggerItem = triggerConfig.find(item => item.flipName === trigger);
         console.log('triggerItem', triggerItem);
         const data = {
             frame,
-            ai_type: 1,
-            networkStructure: {
-                filePath: `${netfilePath}/${network}`,
-                name: network
-            },
-            dataset: {
-                name: dataset,
-                imagePath: dataSetItem?.imagePath,
-                filePath: dataSetItem?.filePath,
-                num_classes: dataSetItem?.numClasses,
-            },
-            mean: preParams?.mean,
-            std: preParams?.std,
-            scale: preParams?.scale,
-            inputsize: preParams?.inputsize,
-            method: attackMethod,
-            parameterJson: params,
-            flipFlop: triggerItem?.flipPath,
-            outPutPath: ''
+            networkStructure: network?.name,
+            networkStructureId: network?.id,
+            dataSet: dataset?.name,
+            dataSetId: dataset?.id,
+            mean: preParams?.mean.join(','),
+            std: preParams?.std.join(','),
+            scale: preParams?.scale.join(','),
+            inputsize: preParams?.inputsize.join(','),
+            attackMethod: attackMethod,
+            attackMethodId: "",
+            parameterJson: JSON.stringify(params),
+            flipFlop: "",
         }
         console.log('data', data);
-        // TODO: 启动服务
         // await addRule(data)
     }
     
@@ -396,8 +394,8 @@ export const AttackForm: React.FC = () => {
                                 options={['PyTorch', 'TensorFlow']}
                                 fieldProps={{ onChange: (e) => { handleFrame(e.target.value) } }}
                             />
-                            <TabInput config={networkConfig} label='网络结构' buttonText='添加网络结构' modal={NetWorkModal} onChange={setNetwork} action={addNetwork} deleteAction={deleteNetWork} example={networkExample} selected={network} />
-                            <TabInput config={datasetConfig} label='数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} example={datasetExample} selected={dataset} />
+                            <TabInput config={networkConfig} label='网络结构' buttonText='添加网络结构' modal={NetWorkModal} onChange={handleNetwork} action={addNetwork} deleteAction={deleteNetWork} example={networkExample} selected={network?.id} />
+                            <TabInput config={datasetConfig} label='数据集' buttonText='添加数据集' modal={DataModal} onChange={handleDataset} action={addDataset} deleteAction={deleteDataset} example={datasetExample} selected={dataset?.id} />
                             <PreParameters defaultValue={preParams} onPreParametersChange={setPreParams} />
                         </Col>
                         <Col span={8}>

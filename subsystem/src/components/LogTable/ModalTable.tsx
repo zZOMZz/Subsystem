@@ -89,19 +89,19 @@ const LogTable: React.FC = () => {
         },
         {
             title: '启动时间',
-            dataIndex: 'beginTime',
+            dataIndex: 'startTime',
             sorter: true,
             valueType: 'dateTime',
         },
         {
             title: '完成时间',
-            dataIndex: 'endTime',
+            dataIndex: 'completeTime',
             sorter: true,
             valueType: 'dateTime',
         },
         {
             title: '状态',
-            dataIndex: 'status',
+            dataIndex: 'state',
             valueEnum: {
                 0: {
                     text: '未完成',
@@ -121,17 +121,17 @@ const LogTable: React.FC = () => {
         },
         {
             title: '待测试模型',
-            dataIndex: 'testModel',
+            dataIndex: 'modelTest',
             valueType: 'text',
         },
         {
             title: '数据集',
-            dataIndex: 'dataset',
+            dataIndex: 'dataSet',
             valueType: 'text',
         },
         {
             title: '检测方法',
-            dataIndex: 'detect',
+            dataIndex: 'detectionMethod',
             valueType: 'text',
         },
         {
@@ -178,27 +178,28 @@ const LogTable: React.FC = () => {
         target_label: 0
     }
 
-    const preParamsContent = (preParams: preParamsType) => {
+    const preParamsContent = (record: any) => {
         return (
             <div className={styles['params']}>
                 <span className={styles['item']} >
-                    <span>mean:[{preParams.mean.join(', ')}]</span>
+                    <span>mean:[{record.mean}]</span>
                 </span>
                 <span className={styles['item']}>
-                    <span>std:[{preParams.std.join(', ')}]</span>
+                    <span>std:[{record.std}]</span>
                 </span>
                 <span className={styles['item']}>
-                    <span>scale:[{preParams.scale.join(', ')}]</span>
+                    <span>scale:[{record.scale}]</span>
                 </span>
                 <span className={styles['item']}>
-                    <span>inputSize:[{preParams.inputSize.join(', ')}]</span>
+                    <span>inputSize:[{record.inputSize}]</span>
                 </span>
             </div>
         )
     }
 
 
-    const paramsContent = (params: paramsType) => {
+    const paramsContent = (record: any) => {
+        const params = JSON.parse(record.parameterJson);
         return (
             <div className={styles['params']}>
                 {
@@ -209,25 +210,25 @@ const LogTable: React.FC = () => {
             </div>
         )
     }
-    const items: CollapseProps['items'] = [
-        {
-            key: '1',
-            label: '预处理参数',
-            children: preParamsContent(preParams),
-        },
-        {
-            key: '2',
-            label: '参数',
-            children: paramsContent(params),
-        },
-    ];
+    
+    const expandedRowRender = (record: any) => {
+        const items: CollapseProps['items'] = [
+            {
+                key: '1',
+                label: '预处理参数',
+                children: preParamsContent(record),
+            },
+            {
+                key: '2',
+                label: '参数',
+                children: paramsContent(record),
+            },
+        ];
 
-
-    const expandedRowRender = () => {
         return (
             <>
                 <Collapse items={items} bordered={false} style={{ borderRadius: '0px' }} />
-                <ModalCard />
+                <ModalCard jsonObject={record.jsonObject} />
             </>
         )
     }

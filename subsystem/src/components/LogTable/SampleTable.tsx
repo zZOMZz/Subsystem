@@ -104,19 +104,19 @@ const LogTable: React.FC = () => {
         },
         {
             title: '启动时间',
-            dataIndex: 'beginTime',
+            dataIndex: 'startTime',
             sorter: true,
             valueType: 'dateTime',
         },
         {
             title: '完成时间',
-            dataIndex: 'endTime',
+            dataIndex: 'completeTime',
             sorter: true,
             valueType: 'dateTime',
         },
         {
             title: '状态',
-            dataIndex: 'status',
+            dataIndex: 'state',
             valueEnum: {
                 0: {
                     text: '未完成',
@@ -137,24 +137,24 @@ const LogTable: React.FC = () => {
         },
         {
             title: '待测试样本数',
-            dataIndex: 'sampleNum',
+            dataIndex: 'sampleNumber',
             valueType: 'text',
             width: 120
         },
         {
             title: '模型',
-            dataIndex: 'model',
+            dataIndex: 'correspondModel',
             valueType: 'text',
         },
         {
             title: '数据集',
-            dataIndex: 'dataset',
+            dataIndex: 'dataSet',
             valueType: 'text',
             width: 120
         },
         {
             title: '检测方法',
-            dataIndex: 'detect',
+            dataIndex: 'detectionMethod',
             valueType: 'text',
             width: 140
         },
