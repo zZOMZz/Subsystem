@@ -19,7 +19,7 @@ export interface modalConfig {
 // 添加网络模型modal
 export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel, handleOk, action,example}) => {
     const [form] = Form.useForm();
-    const [File, setFile] = useState<UploadFile>();
+    const [file, setFile] = useState<UploadFile>();
 
     const handleUploadChange = (file: UploadFile) => {
         console.log('onChange', file);
@@ -30,28 +30,25 @@ export const NetWorkModal: React.FC<modalConfig> = ({ isModalOpen, handleCancel,
         const isTxtOrZip = file.type === 'text/plain' || file.type === 'application/zip';
         if (!isTxtOrZip) {
             message.error('只能上传txt或zip文件');
+            return false
         }
         return true
     }
 
     const onOk = () => {
-        console.log('onOk');
         form.validateFields().then((values) => {
             // TODO: 服务端响应接收到上传的网络结构
             console.log('values', values);
-            if (File) {
-                const formData = new FormData();
-                formData.append('file', values.upload.file);
-                uploadFile(formData).then((res) => {
-                    console.log('res', res);
-                    const data = {
-                        name: values.network,
-                        filePath: res.data.filePath,
-                        custom: true
-                    }
-                    action(data)
-                })
-            }
+            console.log('file', file);
+            uploadFile(file?.originFileObj as File).then((res) => {
+                console.log('res', res);
+                const data = {
+                    name: values.network,
+                    filePath: res.data.filePath,
+                    custom: true
+                }
+                action(data)
+            })
             form.resetFields()
         })
         handleOk()

@@ -25,7 +25,7 @@ const TabInput: React.FC<TabInputConfig> = ({config, label, buttonText, modal, o
         >
             <Button className={styles['form-item_topButton']} type="link" size="small" onClick={() => setIsModalOpen(true)}>{ buttonText }</Button>
             <Radio.Group className={styles['form-item_radioGroup']} buttonStyle="solid" onChange={(e) => { onChange(e.target.value)}} value={selected}>
-                {config.map((item: any) => 
+                {config && config.map((item: any) => 
                     <div className={styles['form-item_radioItem']}>
                         <Popover content={item.name} trigger="hover">
                             <Radio.Button value={item.id} >
